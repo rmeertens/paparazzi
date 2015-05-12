@@ -1986,7 +1986,10 @@
     <field name="cmd_theta"   type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
   </message>
 
-  <!--229 is free -->
+  <message name="DISTANCE_MATRIX" id="229">
+    <field name="lineBuffer" type="uint8[]"/>
+  </message>
+
 
   <message name="AHRS_ARDRONE2" id="230">
     <field name="state" type="uint32" />

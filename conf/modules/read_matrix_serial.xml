@@ -1,0 +1,16 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="read_matrix_serial">
+  <doc>
+    <description>reads from the serial</description>
+  </doc>
+  <header>
+    <file name="read_matrix_serial.h"/>
+  </header>
+  <init fun="serial_init()"/>
+  <periodic fun="serial_update()" freq="0.25" start="serial_start()" stop="serial_stop()"/>
+  <makefile>
+    <file name="read_matrix_serial.c"/>
+  </makefile>
+</module>
+
