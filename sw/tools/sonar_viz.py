@@ -20,8 +20,27 @@ import matplotlib.pyplot as plt
 
 
 
-LAST_DATA=range(0,15)
+LAST_DATA=range(0,19)
 
+def draw_sonar_visualisation(matrix):
+    BINS=4
+    plt.ion()
+    print 'matrix arrived: ', matrix[1]
+    r = matrix[1]
+    #r = (map(abs, map(int, r)))
+    RADIANTS = 0.8
+    START=0.55
+    theta = np.arange(START, np.pi * RADIANTS, (RADIANTS * np.pi) / len(r))
+    ax = plt.subplot(111, polar=True)
+    ax.clear()
+    colors = ['r', 'g', 'b', 'y', 'k']
+    for i in range(0, BINS):
+        r = matrix[i] 
+        r = (map(abs, map(int, r)))
+        ax.plot(theta, r, color=colors[i], linewidth=3)
+    ax.set_rmax(105.0)
+    ax.grid(True)
+    plt.draw()
 class Visualization:
     def __init__(self, parent):
          print 'Initialisation visualization'
@@ -29,9 +48,11 @@ class Visualization:
         global LAST_DATA
         data = str(larg[0]).split(' ')
         print 'received data' , data, 'And this would mean: ', data[2::]
+	LAST_DATA = data[2::][0].split(',')
+	for i in range(0,len(LAST_DATA)):
+		LAST_DATA[i]=int(LAST_DATA[i])
 	print 'LAST_DATA IS NOW: ', LAST_DATA
-        LAST_DATA=data[2::]
-        print 'RECEIVED LAST DATA: ', LAST_DATA
+	
      
 class Visualizer:
     def __init__(self):
@@ -81,17 +102,16 @@ def run():
     try:
         while True:
             time.sleep(.02)
-
-            r = LAST_DATA
-            r = (map(abs, map(int,r)))
-            theta = np.arange(0,np.pi*2,(2*np.pi)/len(r))
-            ax = plt.subplot(111,polar=True)
-            ax.clear()
-            ax.plot(theta, r, color='r', linewidth=3)
-            ax.set_rmax(25.0)
-            ax.grid(True)
-
-            plt.draw()
+	    matrix=[[0]*5 for i in range(5)]
+	    print 'matrix: ', matrix
+	    print 'LAST_DATA: ', LAST_DATA
+	    matrix = []
+	    for i in range(0,4):
+	        toAdd = LAST_DATA[i*4:(i+1)*4]
+		print toAdd
+		matrix.append(toAdd)
+	    print 'Matrix now: ', matrix
+	    draw_sonar_visualisation(matrix)
 
               
 

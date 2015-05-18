@@ -50,10 +50,12 @@ void serial_port_flush_output(struct SerialPort *me)
 int  serial_port_open_raw(struct SerialPort *me, const char *device, speed_t speed)
 {
   if ((me->fd = open(device, O_RDWR | O_NONBLOCK | O_NOCTTY)) < 0) {
+	 printf("There was an error when opening");
     TRACE(TRACE_ERROR, "%s, open failed: %s (%d)\n", device, strerror(errno), errno);
     return -1;
   }
   if (tcgetattr(me->fd, &me->orig_termios) < 0) {
+	  printf("There was an other error when opening");
     TRACE(TRACE_ERROR, "%s, get term settings failed: %s (%d)\n", device, strerror(errno), errno);
     close(me->fd);
     return -1;
@@ -73,15 +75,18 @@ int  serial_port_open_raw(struct SerialPort *me, const char *device, speed_t spe
   me->cur_termios.c_oflag &=~(OPOST|ONLCR|OCRNL|ONOCR|ONLRET);
 
   if (cfsetispeed(&me->cur_termios, speed)) {
+	  printf("There was an 3 error when opening");
     TRACE(TRACE_ERROR, "%s, set term speed failed: %s (%d)\n", device, strerror(errno), errno);
     close(me->fd);
     return -1;
   }
   if (tcsetattr(me->fd, TCSADRAIN, &me->cur_termios)) {
+	  printf("There was an 4 when opening");
     TRACE(TRACE_ERROR, "%s, set term attr failed: %s (%d)\n", device, strerror(errno), errno);
     close(me->fd);
     return -1;
   }
+  printf("Everything is ok");
   serial_port_flush(me);
   return 0;
 }

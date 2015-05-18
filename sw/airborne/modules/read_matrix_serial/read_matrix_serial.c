@@ -32,19 +32,21 @@
 #include <termios.h>
 #include <unistd.h>
 #include <inttypes.h>
+#include <serial_port.h>
+#define SIZE_OF_ONE_IMAGE 52
 
-#define toRead 50
 
 
-int USB_INPUT = 0;
-char psResponse[toRead];
+char psResponse[2*SIZE_OF_ONE_IMAGE];
 double n;
-int SIZE_OF_ONE_IMAGE=50;
 uint8_t MATRIX_WIDTH = 4;
-uint8_t lineBuffer[16];
+
 struct termios tty;
+int spot=0;
 
-
+uint8_t lineBuffer[16];
+struct SerialPort *port;
+uint8_t response[SIZE_OF_ONE_IMAGE*2];
 
 static void send_distance_matrix(void) {
 	DOWNLINK_SEND_DISTANCE_MATRIX(DefaultChannel, DefaultDevice, sizeof lineBuffer, lineBuffer);
@@ -53,112 +55,80 @@ static void send_distance_matrix(void) {
 int search_start_position(int startPosition, int size_of_one_image, uint8_t* raw){
     int sync=0;
     // Search for the startposition
-    for (int i=startPosition; i < size_of_one_image; i++){
+    for (int i=startPosition; i < size_of_one_image-1; i++){
+    	printf("Now ckecing startpos: %d , has: %d\n", i, (uint8_t)raw[i]);
         if ((raw[i] == 255) && (raw[i + 1] == 0) && (raw[i + 2] == 0)){
-	    printf("Possible end of image: %d", i);
+        	printf("Possible end of image: %d", i);
             if (raw[i + 3] == 171){
                 sync = i;
                 break;
-	    }
-	}
+            }
+        }
     }
     return sync;
 }
 
 void serial_init(void) {
 	printf("Init serial\n");
+	memset(response, '\0', sizeof response);
+	port = serial_port_new();
+	speed_t speed = B3000000;
+	int result=serial_port_open_raw(port,"/dev/ttyUSB0",speed);
+	printf("Result open: %d", port->fd);
+
 	register_periodic_telemetry(DefaultPeriodic, "DISTANCE_MATRIX", send_distance_matrix);
 
-	USB_INPUT = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY);
-
-	memset (&tty, 0, sizeof tty);
-
-
-	if ( tcgetattr ( USB_INPUT, &tty ) != 0 ) {
-		printf("Error XXX from tcgetattr: XXX\n");//	   printf("Error %s" << errno << " from tcgetattr: " << strerror(errno) << std::endl;
-	}
-
-
-	cfsetospeed (&tty, (speed_t)B3000000);
-	cfsetispeed (&tty, (speed_t)B3000000);
-
-
-	tty.c_cflag     &=  ~PARENB;            // Make 8n1
-	tty.c_cflag     &=  ~CSTOPB;
-	tty.c_cflag     &=  ~CSIZE;
-	tty.c_cflag     |=  CS8;
-
-	tty.c_cflag     &=  ~CRTSCTS;           // no flow control
-	tty.c_cc[VMIN]   =  1;                  // read doesn't block
-	tty.c_cc[VTIME]  =  50;                  // 0.5 seconds read timeout
-	tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
-
-
-	cfmakeraw(&tty);
 //	close(USB_INPUT);
-
+	printf("\nEnd init serial");
 }
 void serial_update(void) {
-
-	for (int x = 0; x < sizeof lineBuffer; x++)
-	{
-	  lineBuffer[x] = 0; 
-	}
-	
 	printf("---Reading read distance matrix-----\n");
-
-/*
-	tcflush( USB_INPUT, TCIFLUSH );	//Flush Port, then applies attributes 
-	if ( tcsetattr ( USB_INPUT, TCSANOW, &tty ) != 0) {
-	   //std::cout << "Error " << errno << " from tcsetattr" << std::endl;
-	   printf("Error XXX from tcsetattr XXX\n");
-	}
-*/
-	int n = 0,
-	spot = 0;
+	int n=0;
+	int fd = port->fd;
 	char buf = '\0';
-
-
-
-	uint8_t response[2*SIZE_OF_ONE_IMAGE];
-	memset(response, '\0', sizeof response);
-
+	int skippedStuff =0;
+	int tried=0;
 	do {
-	   n = read( USB_INPUT, &buf, 1 );
-	   sprintf( &response[spot], "%c", buf );
-	   spot += n;
-	//   printf("-%d->%d<",buf,n);
-	//} while( (spot < sizeof response) && (buf != '\r') && (n > 0));
-	} while( (spot < sizeof response) && (n > 0));
-	//printf("\n---\nDone with this! \n %d %d %d\n---\n", spot < sizeof response, buf != '\r', n > 0);
+	   n = read( fd, &buf, 1 );
+	   tried++;
 
-	int startPos = 0; 
+	   if (n > 0){
+		   spot++;
+		   sprintf( &response[spot], "%c", buf );
+	   }
+	} while((tried<SIZE_OF_ONE_IMAGE) && (spot < sizeof response-2));
 
-	int arrayIndex = 0;
 
-	for (int x = 0; x < sizeof lineBuffer; x++)
+	if(spot>(2*SIZE_OF_ONE_IMAGE-2))
 	{
-	  lineBuffer[x] = 0; 
-	}
+		spot=0;
+		int startPos = search_start_position(0,SIZE_OF_ONE_IMAGE,response);
+		printf("Found startpos: %d ", startPos);
+		int arrayIndex = 0;
+		for (int x = 0; x < sizeof lineBuffer; x++)
+		{
+		  lineBuffer[x] = 0;
+		}
 
 
-	for (int i = startPos; i < SIZE_OF_ONE_IMAGE + startPos;i++){
-		if ((response[i] == 255) && (response[i + 1] == 0) && (response[i + 2] == 0)){
-		    if (response[i + 3] == 128){
-		 	// Start Of Line
-		        int startOfBuf = i + 4;
-		        int endOfBuf = (i + 4 + MATRIX_WIDTH);
-			for(int indexInBuffer = startOfBuf; indexInBuffer < endOfBuf; indexInBuffer++){
-		   	    lineBuffer[arrayIndex] = response[indexInBuffer];
-			    arrayIndex++;
+		for (int i = startPos; i < SIZE_OF_ONE_IMAGE + startPos;i++){
+			if ((response[i] == 255) && (response[i + 1] == 0) && (response[i + 2] == 0)){
+				if (response[i + 3] == 128){
+				// Start Of Line
+					int startOfBuf = i + 4;
+					int endOfBuf = (i + 4 + MATRIX_WIDTH);
+					for(int indexInBuffer = startOfBuf; indexInBuffer < endOfBuf; indexInBuffer++){
+						lineBuffer[arrayIndex] = response[indexInBuffer];
+						arrayIndex++;
+					}
+				}
 			}
-		    }
-		  }
-	}
+		}
 
-	for (int x = 0; x < sizeof lineBuffer; x++)
-	{
-	  printf("%d\n",lineBuffer[x]);
+		for (int x = 0; x < sizeof lineBuffer; x++)
+		{
+		  printf("%d\n",lineBuffer[x]);
+		}
 	}
 
 }
