@@ -88,6 +88,7 @@ void serial_update(void) {
 	char buf = '\0';
 	int skippedStuff =0;
 	int tried=0;
+	// Read everything
 	do {
 	   n = read( fd, &buf, 1 );
 	   tried++;
