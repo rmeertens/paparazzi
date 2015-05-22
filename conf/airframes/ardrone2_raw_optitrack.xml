@@ -28,6 +28,7 @@
 
   <modules main_freq="512">
     <load name="read_matrix_serial.xml"/>
+    <load name="video_rtp_stream.xml"/>
   </modules>
 
   <commands>
