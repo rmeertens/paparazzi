@@ -174,3 +174,10 @@ tests/results/*
 
 *.dSYM
 
+# Qt creator config files
+ardrone2_raw.config
+*.creator
+*.files
+*.includes
+
+
