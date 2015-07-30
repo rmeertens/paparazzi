@@ -32,6 +32,7 @@
 #include <pthread.h>
 #include "state.h"
 #include "subsystems/abi.h"
+#include "subsystems/electrical.h"
 
 #include "lib/v4l/v4l2.h"
 #include "lib/encoding/jpeg.h"

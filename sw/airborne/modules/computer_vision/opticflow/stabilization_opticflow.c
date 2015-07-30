@@ -35,8 +35,12 @@
 #include "firmwares/rotorcraft/guidance/guidance_v.h"
 #include "autopilot.h"
 #include "subsystems/datalink/downlink.h"
+#include "subsystems/electrical.h"
+#include "std.h"
 
+//#ifndef CMD_OF_SAT
 #define CMD_OF_SAT  1500 // 40 deg = 2859.1851
+//#endif
 
 #ifndef VISION_PHI_PGAIN
 #define VISION_PHI_PGAIN 400
@@ -116,6 +120,9 @@ void guidance_h_module_read_rc(void)
  */
 void guidance_h_module_run(bool_t in_flight)
 {
+  int vsupply_scaled=electrical.vsupply*10;
+
+
   /* Update the setpoint */
   stabilization_attitude_set_rpy_setpoint_i(&opticflow_stab.cmd);
 
