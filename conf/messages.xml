@@ -184,8 +184,22 @@
     <field name="segment_north_2" type="float" unit="m"/>
   </message>
 
-  <!-- ID 23 is free -->
+  <!-- ID 23 is NOT free -->
+  <message name ="CNT_OBST" id="23">
+    <field name ="CNT_OBST" type="int32[20]"/>
+  </message> 
+    
   <!-- ID 24 is free -->
+  <message name ="R_DOT_AND_SPEED" id="24">
+    <field name ="R_DOT_NEW" type="float"/>
+    <field name ="HOPPERDIEPOP" type="float"/>
+    <field name ="REF_PITCH" type="float"/>
+    <field name ="REF_ROLL" type="float"/>
+    <field name ="R_DOT_NEW_SIN" type="float"/>
+    <field name ="R_DOT_NEW_COS" type="float"/>
+    <field name ="SPEED_POT" type="float"/>
+    <field name ="MATRIX_SUM" type="uint16[]"/>
+  </message>
 
   <message name="SVINFO" id="25">
     <field name="chn" type="uint8"/>
@@ -1879,7 +1893,11 @@
     <field name="g2_r" type="float"/>
   </message>
 
-  <!--217 is free -->
+    <!--217 is NOT free -->
+  <message name="INPUT_CONTROL" id="217">
+    <field name ="err_vx" type="float"/>
+    <field name ="err_vy" type="float"/>
+  </message>
 
   <message name="BEBOP_ACTUATORS" id="218">
     <field name="cmd_thrust" type="int32"/>
@@ -1928,7 +1946,12 @@
     <field name="AMSL_GPS" type="float" unit="ft" alt_unit="m"/>
   </message>
 
- <!--224 is free -->
+ <!--224 is NOT free -->
+   <message name="MATRIX_KALMAN" id="224">
+    <field name="K_gain" type="float"/>
+    <field name="ESTIMATED_MATRIX" type="float[]"/>
+  </message>
+
 
   <message name="VIDEO_SYNC" id="225">
     <field name="id" type="uint8"/>
@@ -1959,9 +1982,20 @@
     <field name="cmd_theta"   type="int32" alt_unit="deg" alt_unit_coef="0.0139882"/>
   </message>
 
-  <!--229 is free -->
+  <!--229 is NOT free -->
+  <message name="DISTANCE_MATRIX" id="229">
+    <field name="line" type="uint8"/>
+    <field name="imageBuffer" type="uint8[]"/>
+  </message>
 
-  <!--230 is free -->
+  <!--230 is  NOT free -->
+  <message name ="YAW_RATE" id="230">
+    <field name ="YAW_RATE" type="float"/>
+    <field name ="YAW_REF" type="float"/>
+    <field name ="R_DOT_NEW" type="float"/>
+    <field name ="PITCH_REF" type="float"/>
+    <field name ="ROLL_REF" type="float"/>
+  </message> 
 
   <message name="ROTORCRAFT_STATUS" id="231">
     <field name="link_imu_nb_err" type="uint32"/>
