@@ -36,6 +36,7 @@
     <load name="cv_opticflow.xml">
 	<define name="CMD_OF_SAT" value="1500"/><!--40 deg = 2859.1851-->
    </load>
+   <load name="read_matrix_serial_opticflow.xml"/>
   </modules>
 
   <commands>

@@ -35,6 +35,18 @@
 #include "inter_thread_data.h"
 #include "math/pprz_algebra_int.h"
 
+int8_t filter_flag;
+int8_t OA_method_flag;
+
+float ref_pitch;
+float ref_roll;
+float OF_Result_Vy;
+float OF_Result_Vx;
+
+float r_dot_new;
+float speed_pot;
+
+
 /* The opticflow stabilization */
 struct opticflow_stab_t {
   int32_t phi_pgain;        ///< The roll P gain on the err_vx

@@ -90,6 +90,7 @@ struct opticflow_stab_t opticflow_stab = {
   .desired_vy = VISION_DESIRED_VY
 };
 
+
 /**
  * Horizontal guidance mode enter resets the errors
  * and starts the controller.
