@@ -86,12 +86,12 @@
     <define name="ACCEL_Z_NEUTRAL" value="2048"/>
 
     <!-- Magneto calibration -->
-    <define name="MAG_X_NEUTRAL" value="33"/>
-	<define name="MAG_Y_NEUTRAL" value="-8"/>
-	<define name="MAG_Z_NEUTRAL" value="5"/>
-	<define name="MAG_X_SENS" value="14.4505672039" integer="16"/>
-	<define name="MAG_Y_SENS" value="13.7872171576" integer="16"/>
-	<define name="MAG_Z_SENS" value="14.4884287785" integer="16"/>
+    <define name="MAG_X_NEUTRAL" value="-49"/>
+    <define name="MAG_Y_NEUTRAL" value="-32"/>
+    <define name="MAG_Z_NEUTRAL" value="14"/>
+    <define name="MAG_X_SENS" value="13.9026621573" integer="16"/>
+    <define name="MAG_Y_SENS" value="11.6759489323" integer="16"/>
+    <define name="MAG_Z_SENS" value="14.6706171317" integer="16"/>
 
 
     <!-- Magneto current calibration -->
