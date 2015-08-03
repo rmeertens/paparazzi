@@ -24,7 +24,7 @@
  */
 
 #include "modules/read_matrix_serial/read_matrix_serial.h"
-#include "modules/computer_vision/stabilization_practical.h"
+//#include "modules/computer_vision/stabilization_practical.h"
 #include "subsystems/datalink/telemetry.h"
 #include <stdio.h>
 #include <sys/fcntl.h>
@@ -36,10 +36,15 @@
 #include <serial_port.h>
 #include "read_matrix_serial.h"
 #include "math/pprz_geodetic_int.h"
+#include "math/pprz_algebra_float.h"
+#include "state.h"
+
+float ref_pitch;
+float ref_roll;
 
 speed_t usbInputSpeed = B1000000;
 
-#define PRINT_STUFF 0
+#define PRINT_STUFF 1
 
 uint8_t singleImageColumnCount=6;
 uint8_t camerasCount=6;
@@ -190,6 +195,8 @@ void serial_init(void) {
   
 	// Open the serial port
 	READING_port = serial_port_new();
+	
+	printf("start reading matrix\n");
 	int result=serial_port_open_raw(READING_port,"/dev/ttyUSB0",usbInputSpeed);
 	register_periodic_telemetry(DefaultPeriodic, "DISTANCE_MATRIX", send_distance_matrix);
 	register_periodic_telemetry(DefaultPeriodic, "MATRIX_KALMAN", send_MATRIX_KALMAN);
