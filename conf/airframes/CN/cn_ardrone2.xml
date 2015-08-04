@@ -33,9 +33,9 @@
     <load name="bat_voltage_ardrone2.xml"/>
     <!-- remove the gps_ubx_ucenter module if you use the sirf gps (flight recorder) -->
     <load name="air_data.xml"/>
-    <!--<load name="cv_opticflow.xml">
+    <load name="cv_opticflow.xml">
 	<define name="CMD_OF_SAT" value="1500"/>
-   </load>-->
+   </load>
    <!--<load name="read_matrix_serial.xml"/>-->
    <load name="read_matrix_serial_opticflow.xml"/>
   </modules>
