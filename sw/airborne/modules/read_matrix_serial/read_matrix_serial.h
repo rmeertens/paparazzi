@@ -31,7 +31,7 @@
 extern uint8_t *READimageBuffer;
 extern float *READimageFilter;
 extern uint8_t SendREADimageBuffer[36];
-extern float Xest_new[36*6];
+extern float Xest_new[36*6];//is new
 
 void allocateSerialBuffer(int, int);
 int isEndOfImage(uint8_t*);
