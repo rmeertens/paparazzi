@@ -63,14 +63,15 @@ static inline int get_rt_prio(int prio)
 }
 
 #include <sys/resource.h>
+#include <unistd.h>
 #include <sys/syscall.h>
 
-static inline int set_nice_level(int nice)
+static inline int set_nice_level(int level)
 {
   pid_t tid;
   tid = syscall(SYS_gettid);
 
-  return setpriority(PRIO_PROCESS, tid, nice);
+  return setpriority(PRIO_PROCESS, tid, level);
 }
 
 #endif /* RT_PRIORITY_H */
