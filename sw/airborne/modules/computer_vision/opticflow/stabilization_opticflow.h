@@ -31,7 +31,7 @@
 #define CV_STABILIZATION_OPTICFLOW_H_
 
 #include "std.h"
-#include "lib/v4l/v4l2.h"
+#include "../lib/v4l/v4l2.h"
 #include "inter_thread_data.h"
 #include "math/pprz_algebra_int.h"
 

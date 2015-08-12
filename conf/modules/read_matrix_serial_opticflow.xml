@@ -8,7 +8,7 @@
     <file name="read_matrix_serial.h"/>
   </header>
   <init fun="serial_init()"/>
-  <periodic fun="serial_update()" freq="10" start="serial_start()" stop="serial_stop()" freq="512"/>
+  <periodic fun="serial_update()" freq="10" start="serial_start()" stop="serial_stop()"/>
   <makefile>
     <file name="read_matrix_serial_opticflow.c"/>
     <!-- <file name="../computer_vision/stabilization_practical.c"/> -->
