@@ -37,16 +37,19 @@
  <!--   <load name="gps_ubx_ucenter.xml"/>-->
   <!--  <load name="air_data.xml"/>-->
     <!--<load name="geo_mag.xml"/>-->
+<!--<load name="cv_opticflow.xml">
+	<define name="CMD_OF_SAT" value="1500"/>
+</load>-->
+<load name="readlocationfromodroid.xml"/>
 
+<!--
  <load name="video_rtp_stream.xml">
  	<define name="VIEWVIDEO_DEVICE" value="/dev/video1"/>
 	<define name="VIEWVIDEO_QUALITY_FACTOR" value="75"/>
     <define name="VIEWVIDEO_FPS" value="10"/>
     <define name="VIEWVIDEO_SHOT_PATH" value="/data/video/usb0/images"/>
     </load>
-  <load name="video_usb_logger.xml">
-
-</load>
+  <load name="video_usb_logger.xml"/>-->
   </modules>
 
   <commands>

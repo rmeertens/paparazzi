@@ -1,0 +1,17 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="readlocationfromodroid">
+  <doc>
+    <description>reads from the odroid</description>
+  </doc>
+  <header>
+    <file name="readlocationfromodroid.h"/>
+  </header>
+  <init fun="odroid_loc_init()"/>
+  <periodic fun="odroid_loc_periodic()" freq="10" autorun="TRUE"/>
+  <makefile>
+    <file name="readlocationfromodroid.c"/>
+    <file name="cJSON.c"/>
+  </makefile>
+</module>
+
