@@ -39,13 +39,44 @@
 #include "cJSON.h"
 
 #include "subsystems/ins/ins_int.h"
+#include "subsystems/datalink/telemetry.h"
 
+
+#include "firmwares/rotorcraft/autopilot.h"
+
+#include "mcu_periph/uart.h"
+#include "subsystems/radio_control.h"
+#include "subsystems/commands.h"
+#include "subsystems/actuators.h"
+#include "subsystems/electrical.h"
+#include "subsystems/settings.h"
+#include "subsystems/datalink/telemetry.h"
+#include "firmwares/rotorcraft/navigation.h"
+#include "firmwares/rotorcraft/guidance.h"
+
+#include "firmwares/rotorcraft/stabilization.h"
+#include "firmwares/rotorcraft/stabilization/stabilization_none.h"
+#include "firmwares/rotorcraft/stabilization/stabilization_rate.h"
+#include "firmwares/rotorcraft/stabilization/stabilization_attitude.h"
+
+#include "generated/settings.h"
+
+float test1=23.0;
+float test2 = 24.0;
+static void send_odometry(struct transport_tx *trans, struct link_device *dev)
+{
+    pprz_msg_send_ODOMETRY(trans, dev, AC_ID, &test1,&test2);
+    //DOWNLINK_SEND_ODOMETRY (DefaultChannel, DefaultDevice,3.0,4.0);
+}
 
 struct SerialPort *READING_port;
 speed_t usbInputSpeed = B115200;
 char *serialResponse;
 int writeLocationInput=0;
- void odroid_loc_init() {
+
+
+void odroid_loc_init() {
+  register_periodic_telemetry(DefaultPeriodic, "ODOMETRY", send_odometry);
 	// Open the serial port
 	READING_port = serial_port_new();
 	int result=serial_port_open_raw(READING_port,"/dev/ttyUSB0",usbInputSpeed);
@@ -63,6 +94,7 @@ int writeLocationInput=0;
 	if (n < 0)
 	{
 		printf(strerror(errno));
+		printf("\n");
 	}
 	else{
 		writeLocationInput+=n;
@@ -86,13 +118,15 @@ int writeLocationInput=0;
 				if(subbuf[0]=='{' && subbuf[index-1]=='}'){
 					cJSON * root = cJSON_Parse(subbuf);
 					printf("result json: \n");
-					int xValue = cJSON_GetObjectItem(root,"x")->valueint;
-					int yValue = cJSON_GetObjectItem(root,"y")->valueint;
+					int xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
+					int yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
+
 					double rot = cJSON_GetObjectItem(root,"rot")->valuedouble;
 					printf("x: %d\n",xValue);
 					printf("y: %d\n",yValue);
 					printf("^^^^^\n");
-
+					test1 = xValue;
+					test2 = yValue;
 					  gps.lla_pos.lat =519906108+ ((xValue*378.0)/4410.0);
 					  gps.lla_pos.lon = 43768274+((yValue*267.3)/2915);
 

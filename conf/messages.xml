@@ -2109,8 +2109,13 @@
     <field name="vz"   type="float" unit="m/s"/>
   </message>
 
-  <!-- 245 is free -->
-  <!-- 246 is free -->
+  <!-- 245 is NOT free -->
+  <message name="ODOMETRY" id="245">
+    <field name="posx"   type="float" unit="m"/>
+    <field name="posy"   type="float" unit="m"/>
+  </message>
+
+ <!-- 246 is free -->
 
   <message name="PPRZ_DEBUG" id="247">
     <field name="module"   type="uint8"/>
