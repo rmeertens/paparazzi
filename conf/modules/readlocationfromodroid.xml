@@ -12,6 +12,10 @@
   <makefile>
     <file name="readlocationfromodroid.c"/>
     <file name="cJSON.c"/>
+   <!-- <file name="subsystems/gps.c"/>
+    <define name="USE_GPS"/>
+    <define name="GPS_TYPE_H" value="modules/readlocationfromodroid/readlocationfromodroid.h"/>-->
+	<!--<file name="ivy.c"/>-->
   </makefile>
 </module>
 

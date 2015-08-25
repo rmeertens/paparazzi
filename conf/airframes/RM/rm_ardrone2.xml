@@ -37,9 +37,10 @@
  <!--   <load name="gps_ubx_ucenter.xml"/>-->
   <!--  <load name="air_data.xml"/>-->
     <!--<load name="geo_mag.xml"/>-->
-<!--<load name="cv_opticflow.xml">
+
+<load name="cv_opticflow.xml">
 	<define name="CMD_OF_SAT" value="1500"/>
-</load>-->
+</load>
 <load name="readlocationfromodroid.xml"/>
 
 <!--

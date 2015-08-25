@@ -34,7 +34,8 @@
 
 // Needed for settings
 extern struct opticflow_t opticflow;
-
+extern float vel_x;
+extern float vel_y;
 // Module functions
 extern void opticflow_module_init(void);
 extern void opticflow_module_run(void);

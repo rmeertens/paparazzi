@@ -78,6 +78,10 @@ static pthread_mutex_t opticflow_mutex;            ///< Mutex lock fo thread saf
 static void *opticflow_module_calc(void *data);                   ///< The main optical flow calculation thread
 static void opticflow_agl_cb(uint8_t sender_id, float distance);  ///< Callback function of the ground altitude
 
+/* Roland vis gps */
+float vel_x;
+float vel_y;
+
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
 /**
@@ -132,6 +136,9 @@ void opticflow_module_init(void)
   if (opticflow_dev == NULL) {
     printf("[opticflow_module] Could not initialize the video device\n");
   }
+  vel_x=0.0;
+ vel_y=0.0;
+
 
 #if PERIODIC_TELEMETRY
   register_periodic_telemetry(DefaultPeriodic, "OPTIC_FLOW_EST", opticflow_telem_send);
@@ -227,6 +234,8 @@ static void *opticflow_module_calc(void *data __attribute__((unused)))
     memcpy(&opticflow_result, &temp_result, sizeof(struct opticflow_result_t));
     opticflow_got_result = TRUE;
     pthread_mutex_unlock(&opticflow_mutex);
+    vel_x=temp_result.vel_x;
+     vel_y=temp_result.vel_y;
 
 #if OPTICFLOW_DEBUG
     jpeg_encode_image(&img, &img_jpeg, 70, FALSE);
