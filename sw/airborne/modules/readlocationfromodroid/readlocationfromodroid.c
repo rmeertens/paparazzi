@@ -60,9 +60,10 @@
 #include "firmwares/rotorcraft/stabilization/stabilization_attitude.h"
 
 #include "generated/settings.h"
-
+int mustReset =1;
 float test1=23.0;
 float test2 = 24.0;
+int timesRest = 100;
 static void send_odometry(struct transport_tx *trans, struct link_device *dev)
 {
     pprz_msg_send_ODOMETRY(trans, dev, AC_ID, &test1,&test2);
@@ -118,8 +119,8 @@ void odroid_loc_init() {
 				if(subbuf[0]=='{' && subbuf[index-1]=='}'){
 					cJSON * root = cJSON_Parse(subbuf);
 					printf("result json: \n");
-					int xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
-					int yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
+					float xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
+					float yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
 
 					double rot = cJSON_GetObjectItem(root,"rot")->valuedouble;
 					printf("x: %d\n",xValue);
@@ -188,7 +189,17 @@ void odroid_loc_init() {
 	cJSON_AddNumberToObject(droneInformation, "theta", euler->theta);
 	cJSON_AddNumberToObject(droneInformation, "psi", euler->psi);
 	cJSON_AddNumberToObject(droneInformation, "height", state.enu_pos_f.z);
+	cJSON_AddNumberToObject(droneInformation, "accel_z", ins_int.ltp_accel.z);
+	cJSON_AddNumberToObject(droneInformation, "accel_x", ins_int.ltp_accel.x);
+	cJSON_AddNumberToObject(droneInformation, "accel_y", ins_int.ltp_accel.y);
 
+	cJSON_AddNumberToObject(root, "mustReset", mustReset);
+	if (timesRest>0){
+		timesRest-=1;
+	}
+	else{
+		mustReset = 0;
+	}
 	char* toWrite = cJSON_PrintUnformatted(root);
 	int lengthToWrite= strlen(toWrite);
 	printf(toWrite);
