@@ -2,8 +2,16 @@
 
 <module name="readlocationfromodroid">
   <doc>
-    <description>reads from the odroid</description>
+    <description>Reads and writes to and from the odroid</description>
   </doc>
+  <settings>
+    <dl_settings>
+      <dl_settings name="serialjson">
+        <dl_setting var="resetOdroid" min="0" step="1" max="1" shortname="resetOdroid" module="readlocationfromodroid/readlocationfromodroid"/>
+      </dl_settings>
+    </dl_settings>
+  </settings>
+  
   <header>
     <file name="readlocationfromodroid.h"/>
   </header>

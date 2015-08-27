@@ -37,7 +37,7 @@
 #include "state.h"
 #include "subsystems/gps.h"
 #include "cJSON.h"
-
+#include "navdata.h"
 #include "subsystems/ins/ins_int.h"
 #include "subsystems/datalink/telemetry.h"
 
@@ -60,7 +60,7 @@
 #include "firmwares/rotorcraft/stabilization/stabilization_attitude.h"
 
 #include "generated/settings.h"
-int mustReset =1;
+
 float test1=23.0;
 float test2 = 24.0;
 int timesRest = 100;
@@ -74,7 +74,7 @@ struct SerialPort *READING_port;
 speed_t usbInputSpeed = B115200;
 char *serialResponse;
 int writeLocationInput=0;
-
+int resetOdroid=1;
 
 void odroid_loc_init() {
   register_periodic_telemetry(DefaultPeriodic, "ODOMETRY", send_odometry);
@@ -84,6 +84,7 @@ void odroid_loc_init() {
 	int lengthBytesImage=50000;//COMPLETE_MATRIX_WIDTH*MATRIX_ROWS;
 	serialResponse=malloc(lengthBytesImage*sizeof(char));
 	memset(serialResponse, '0', lengthBytesImage);
+	resetOdroid=1;
  }
  void odroid_loc_periodic() {
 	printf("Loc periodic! %d", writeLocationInput);
@@ -111,14 +112,20 @@ void odroid_loc_init() {
 			}
 			if(serialResponse[index]=='\n' && start >=0)
 			{
-				printf("Found end of line!!!");
 				char subbuf[index];
 				memcpy(subbuf,&serialResponse[start],index-start);
 				subbuf[index]='\0';
 				printf("Read now: %s\n",subbuf);
 				if(subbuf[0]=='{' && subbuf[index-1]=='}'){
+
 					cJSON * root = cJSON_Parse(subbuf);
 					printf("result json: \n");
+					int receivedReset = cJSON_GetObjectItem(root,"receivedReset")->valueint;
+					if (resetOdroid && receivedReset){
+							resetOdroid=0;
+					}
+
+					/*
 					float xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
 					float yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
 
@@ -157,6 +164,8 @@ void odroid_loc_init() {
 				      gps.last_3dfix_time = sys_time.nb_sec;
 				    }
 				    AbiSendMsgGPS(GPS_DATALINK_ID, now_ts, &gps);
+
+				    */
 					/*
 					IvySendMsg("0 REMOTE_GPS %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 201,
 					      1,                //uint8 Number of markers (sv_num)
@@ -192,14 +201,18 @@ void odroid_loc_init() {
 	cJSON_AddNumberToObject(droneInformation, "accel_z", ins_int.ltp_accel.z);
 	cJSON_AddNumberToObject(droneInformation, "accel_x", ins_int.ltp_accel.x);
 	cJSON_AddNumberToObject(droneInformation, "accel_y", ins_int.ltp_accel.y);
+	cJSON_AddNumberToObject(droneInformation, "ultrasound", navdata.measure.ultrasound);
+	cJSON_AddNumberToObject(droneInformation, "gpsx", gps.ecef_pos.x);
+	cJSON_AddNumberToObject(droneInformation, "gpsy", gps.ecef_pos.y);
+	cJSON_AddNumberToObject(droneInformation, "gpsz", gps.ecef_pos.z);
+	cJSON_AddNumberToObject(droneInformation, "opticflowvelx", vel_x);
+	cJSON_AddNumberToObject(droneInformation, "opticflowvely", vel_y);
 
-	cJSON_AddNumberToObject(root, "mustReset", mustReset);
-	if (timesRest>0){
-		timesRest-=1;
-	}
-	else{
-		mustReset = 0;
-	}
+
+
+
+	cJSON_AddNumberToObject(root, "mustReset", resetOdroid);
+
 	char* toWrite = cJSON_PrintUnformatted(root);
 	int lengthToWrite= strlen(toWrite);
 	printf(toWrite);

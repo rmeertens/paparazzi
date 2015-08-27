@@ -25,7 +25,7 @@
 
 #ifndef READLOCATIONFROMODROID_H
 #define READLOCATIONFROMODROID_H
-
+extern int resetOdroid;
 extern void odroid_loc_init();
 extern void odroid_loc_periodic();
 
