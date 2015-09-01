@@ -74,7 +74,7 @@ struct SerialPort *READING_port;
 speed_t usbInputSpeed = B115200;
 char *serialResponse;
 int writeLocationInput=0;
-int resetOdroid=1;
+int resetOdroid=0;
 
 void odroid_loc_init() {
   register_periodic_telemetry(DefaultPeriodic, "ODOMETRY", send_odometry);
@@ -84,14 +84,14 @@ void odroid_loc_init() {
 	int lengthBytesImage=50000;//COMPLETE_MATRIX_WIDTH*MATRIX_ROWS;
 	serialResponse=malloc(lengthBytesImage*sizeof(char));
 	memset(serialResponse, '0', lengthBytesImage);
-	resetOdroid=1;
+	resetOdroid=0;
  }
  void odroid_loc_periodic() {
 	printf("Loc periodic! %d", writeLocationInput);
 	char justRead='a';
-	if (writeLocationInput > 200)
+	if (writeLocationInput > 900)
 		writeLocationInput = 0;
-	int n = read(  READING_port->fd, &serialResponse[writeLocationInput], 100);
+	int n = read(  READING_port->fd, &serialResponse[writeLocationInput], 1000);
 	//printf("Read %d bytes\n",n);
 	if (n < 0)
 	{
@@ -102,16 +102,19 @@ void odroid_loc_init() {
 		writeLocationInput+=n;
 		serialResponse[writeLocationInput]='\0';
 		int index=0;
-		printf("Now read in total: %s\n",serialResponse);
+		//printf("Now read bytes %d string: %s\n",strlen(serialResponse),serialResponse);
 		int start=-1;
 		for(index=0; index < n; index++){
 
-			printf("%c",serialResponse[index]);
+			//printf("%c",serialResponse[index]);
 			if(serialResponse[index]=='{'){
 				start=index;
+				printf("Encountered start");
 			}
 			if(serialResponse[index]=='\n' && start >=0)
 			{
+
+				printf("Encountered end");
 				char subbuf[index];
 				memcpy(subbuf,&serialResponse[start],index-start);
 				subbuf[index]='\0';
@@ -120,36 +123,35 @@ void odroid_loc_init() {
 
 					cJSON * root = cJSON_Parse(subbuf);
 					printf("result json: \n");
+					printf(cJSON_PrintUnformatted(root));
+					printf("\n");
 					int receivedReset = cJSON_GetObjectItem(root,"receivedReset")->valueint;
 					if (resetOdroid && receivedReset){
 							resetOdroid=0;
 					}
-
-					/*
 					float xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
 					float yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
 
-					double rot = cJSON_GetObjectItem(root,"rot")->valuedouble;
 					printf("x: %d\n",xValue);
 					printf("y: %d\n",yValue);
 					printf("^^^^^\n");
-					test1 = xValue;
-					test2 = yValue;
-					  gps.lla_pos.lat =519906108+ ((xValue*378.0)/4410.0);
-					  gps.lla_pos.lon = 43768274+((yValue*267.3)/2915);
-
-					  gps.lla_pos.alt = 45321;
+						test1 = xValue;
+						test2 = yValue;
+					  gps.lla_pos.lat =cJSON_GetObjectItem(root,"lat")->valueint;
+					  gps.lla_pos.lon = cJSON_GetObjectItem(root,"lon")->valueint;
+					  //test1 = cJSON_GetObjectItem(root,"lat")->valuedouble;
+					  //test2 = cJSON_GetObjectItem(root,"lon")->valuedouble;
+					  gps.lla_pos.alt = cJSON_GetObjectItem(root,"alt")->valueint;
 					  gps.hmsl        = 125;
-					  printf("Flow %f - %f\n",vel_x,vel_y);
-					  gps.ecef_pos.x = 392433354+((xValue*378.0)/4410.0);
-					  gps.ecef_pos.y = 30036451+ ((yValue*267.3)/2915);
-					  gps.ecef_pos.z = 500219580;
+					  gps.ecef_pos.x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
+					  gps.ecef_pos.y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
+					  gps.ecef_pos.z = cJSON_GetObjectItem(root,"ecefposz")->valueint;;
 
 					  gps.ecef_vel.x = vel_x;
 					  gps.ecef_vel.y = vel_y;
 					  gps.ecef_vel.z = 0;
 
-					  gps.course = rot*100;
+					  gps.course = 100;
 					  gps.num_sv = 11;
 					  gps.tow = 0;
 					  gps.fix = GPS_FIX_3D;
@@ -165,7 +167,6 @@ void odroid_loc_init() {
 				    }
 				    AbiSendMsgGPS(GPS_DATALINK_ID, now_ts, &gps);
 
-				    */
 					/*
 					IvySendMsg("0 REMOTE_GPS %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 201,
 					      1,                //uint8 Number of markers (sv_num)
@@ -215,7 +216,9 @@ void odroid_loc_init() {
 
 	char* toWrite = cJSON_PrintUnformatted(root);
 	int lengthToWrite= strlen(toWrite);
-	printf(toWrite);
+	//printf("Writing to odroid: \n");
+	//printf(toWrite);
+	//printf("\n");
 	write(READING_port->fd,toWrite,lengthToWrite);
 	write(READING_port->fd,"\n",1);
 

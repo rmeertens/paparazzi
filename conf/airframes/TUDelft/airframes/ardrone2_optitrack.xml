@@ -28,6 +28,8 @@
 
   <modules main_freq="512">
     <load name="bat_voltage_ardrone2.xml"/>
+	<load name="cv_opticflow.xml"><define name="CMD_OF_SAT" value="1500"/></load>
+<load name="readlocationfromodroid.xml"/>
   </modules>
 
   <commands>
@@ -189,13 +191,14 @@
     <define name="HOVER_KP" value="583"/>
     <define name="HOVER_KD" value="82"/>
     <define name="HOVER_KI" value="13"/>
-    <define name="NOMINAL_HOVER_THROTTLE" value="0.645"/>
-    <define name="ADAPT_THROTTLE_ENABLED" value="false"/>
+    <define name="NOMINAL_HOVER_THROTTLE" value="0.80"/>
+    <define name="ADAPT_THROTTLE_ENABLED" value="FALSE"/>
   </section>
 
   <section name="GUIDANCE_H" prefix="GUIDANCE_H_">
     <!-- Good weather -->
-    <define name="MAX_BANK" value="20" unit="deg"/>
+    <define name="MAX_BANK" value="10" unit="deg"/>
+    <define name="REF_MAX_SPEED" value="0.3" unit="m/s"/>
     <!-- Bad weather -->
     <!-- define name="MAX_BANK" value="32" unit="deg"/ -->
 

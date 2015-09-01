@@ -25,14 +25,7 @@
   </firmware>
 
   <modules main_freq="512">
-    <load name="bat_voltage_ardrone2.xml"/>
-    <!-- remove the gps_ubx_ucenter module if you use the sirf gps (flight recorder) -->
-    <load name="gps_ubx_ucenter.xml"/>
-    <load name="send_imu_mag_current.xml"/>
-    <load name="air_data.xml"/>
-    <load name="geo_mag.xml"/>
-    <!--load name="logger_file.xml"/-->
-    <!--load name="video_rtp_stream.xml"/-->
+
   </modules>
 
   <commands>
