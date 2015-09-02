@@ -297,6 +297,10 @@ void serial_update(void) {
 #if PRINT_STUFF
 	printf("Read %d bytes\n",n);
 #endif
+	if (n < 0)
+	{
+	    printf("Reading error %d: %s\n", errno,strerror(errno));
+	}
 	timesTriedToRead++;
 	int lastRecordedStart=-1;
 	int lastRecordedEnd=-1;
