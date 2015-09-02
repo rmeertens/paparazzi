@@ -216,9 +216,9 @@ void odroid_loc_init() {
 
 	char* toWrite = cJSON_PrintUnformatted(root);
 	int lengthToWrite= strlen(toWrite);
-	//printf("Writing to odroid: \n");
-	//printf(toWrite);
-	//printf("\n");
+	printf("Writing to odroid: \n");
+	printf(toWrite);
+	printf("\n");
 	write(READING_port->fd,toWrite,lengthToWrite);
 	write(READING_port->fd,"\n",1);
 

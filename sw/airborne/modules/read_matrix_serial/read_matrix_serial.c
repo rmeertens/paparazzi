@@ -197,7 +197,16 @@ void serial_init(void) {
 	READING_port = serial_port_new();
 	
 	printf("start reading matrix\n");
-	int result=serial_port_open_raw(READING_port,"/dev/ttyUSB0",usbInputSpeed);
+	char namePort[50];
+	for(int portExtension = 0; portExtension < 10; portExtension++){
+		sprintf(namePort,"/dev/ttyUSB%d",portExtension);
+		printf("Trying to open %s\n",namePort);
+		int result=serial_port_open_raw(READING_port,namePort,usbInputSpeed);
+		printf("Result: %d\n", result);
+		if(result >=0){
+			break;
+		}
+	}
 	register_periodic_telemetry(DefaultPeriodic, "DISTANCE_MATRIX", send_distance_matrix);
 	register_periodic_telemetry(DefaultPeriodic, "MATRIX_KALMAN", send_MATRIX_KALMAN);
 }		
