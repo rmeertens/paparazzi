@@ -25,7 +25,12 @@
 
 #ifndef READLOCATIONFROMODROID_H
 #define READLOCATIONFROMODROID_H
+#include <inttypes.h>
 extern int resetOdroid;
+
+int32_t optitrack_ecef_x;
+int32_t optitrack_ecef_y;
+int32_t optitrack_ecef_z;
 extern void odroid_loc_init();
 extern void odroid_loc_periodic();
 

@@ -18,14 +18,14 @@
     <subsystem name="actuators" type="ardrone2"/>
     <subsystem name="imu" type="ardrone2"/>
     <!-- gps: "ublox" or change to "sirf" for usage with parrot flight recorder -->
-    <subsystem name="gps" type="ublox"/>
+    <subsystem name="gps" type="datalink"/>
     <subsystem name="stabilization" type="int_quat"/>
     <subsystem name="ahrs" type="int_cmpl_quat"/>
     <subsystem name="ins" type="extended"/>
   </firmware>
 
   <modules main_freq="512">
-
+	<load name="bat_voltage_ardrone2.xml"/>
   </modules>
 
   <commands>

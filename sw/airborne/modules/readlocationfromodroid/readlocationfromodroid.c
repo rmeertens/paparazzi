@@ -149,7 +149,7 @@ void odroid_loc_init() {
 					printf("^^^^^\n");
 						test1 = xValue;
 				test2 = yValue;
-
+/*
 				 gps.ecef_pos.x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
 					  gps.ecef_pos.y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
 					 gps.ecef_pos.z = cJSON_GetObjectItem(root,"ecefposz")->valueint;;
