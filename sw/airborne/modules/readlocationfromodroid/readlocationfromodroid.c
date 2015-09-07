@@ -228,7 +228,23 @@ void odroid_loc_init() {
 	cJSON_AddNumberToObject(droneInformation, "gpsz", gps.ecef_pos.z);
 	cJSON_AddNumberToObject(droneInformation, "opticflowvelx", vel_x);
 	cJSON_AddNumberToObject(droneInformation, "opticflowvely", vel_y);
+	gps.lla_pos.lat = optitrack_lat;
+	  gps.lla_pos.lon = optitrack_lon;
+	 gps.lla_pos.alt = optitrack_alt;
 
+	  gps.hmsl        = optitrack_hmsl;
+
+	  gps.ecef_pos.x = optitrack_ecef_x;
+	  gps.ecef_pos.y = optitrack_ecef_y;
+	  gps.ecef_pos.z = optitrack_ecef_z;
+	  gps.ecef_vel.x = optitrack_ecef_xd;
+	  gps.ecef_vel.y = optitrack_ecef_yd;
+	  gps.ecef_vel.z = optitrack_ecef_zd;
+
+	  gps.course = optitrack_course;
+	  gps.num_sv = optitrack_numsv;
+	  gps.tow = optitrack_tow;
+	  gps.fix = GPS_FIX_3D;
 /*
 	gps.ecef_vel.x = vel_x;
 	gps.ecef_vel.y = vel_y;

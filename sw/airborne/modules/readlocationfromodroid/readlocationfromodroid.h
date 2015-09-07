@@ -31,6 +31,17 @@ extern int resetOdroid;
 int32_t optitrack_ecef_x;
 int32_t optitrack_ecef_y;
 int32_t optitrack_ecef_z;
+int32_t optitrack_lat;
+int32_t optitrack_lon;
+int32_t optitrack_alt;
+
+int32_t optitrack_hmsl;
+int32_t optitrack_ecef_xd;
+int32_t optitrack_ecef_yd;
+int32_t optitrack_ecef_zd;
+int32_t optitrack_course;
+int32_t optitrack_numsv;
+int32_t optitrack_tow;
 extern void odroid_loc_init();
 extern void odroid_loc_periodic();
 
