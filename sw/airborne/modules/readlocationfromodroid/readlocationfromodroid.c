@@ -80,7 +80,18 @@ void odroid_loc_init() {
   register_periodic_telemetry(DefaultPeriodic, "ODOMETRY", send_odometry);
 	// Open the serial port
 	READING_port = serial_port_new();
-	int result=serial_port_open_raw(READING_port,"/dev/ttyUSB0",usbInputSpeed);
+	printf("start reading matrix\n");
+		char namePort[50];
+		for(int portExtension = 0; portExtension < 10; portExtension++){
+			sprintf(namePort,"/dev/ttyUSB%d",portExtension);
+			printf("Trying to open %s\n",namePort);
+			int result=serial_port_open_raw(READING_port,namePort,usbInputSpeed);
+			printf("Result: %d\n", result);
+			if(result >=0){
+				break;
+			}
+		}
+	//int result=serial_port_open_raw(READING_port,"/dev/ttyUSB0",usbInputSpeed);
 	int lengthBytesImage=50000;//COMPLETE_MATRIX_WIDTH*MATRIX_ROWS;
 	serialResponse=malloc(lengthBytesImage*sizeof(char));
 	memset(serialResponse, '0', lengthBytesImage);
@@ -89,6 +100,7 @@ void odroid_loc_init() {
  void odroid_loc_periodic() {
 	printf("Loc periodic! %d", writeLocationInput);
 	char justRead='a';
+
 	if (writeLocationInput > 900)
 		writeLocationInput = 0;
 	int n = read(  READING_port->fd, &serialResponse[writeLocationInput], 1000);
@@ -136,7 +148,12 @@ void odroid_loc_init() {
 					printf("y: %d\n",yValue);
 					printf("^^^^^\n");
 						test1 = xValue;
-						test2 = yValue;
+				test2 = yValue;
+
+				 gps.ecef_pos.x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
+					  gps.ecef_pos.y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
+					 gps.ecef_pos.z = cJSON_GetObjectItem(root,"ecefposz")->valueint;;
+
 					  gps.lla_pos.lat =cJSON_GetObjectItem(root,"lat")->valueint;
 					  gps.lla_pos.lon = cJSON_GetObjectItem(root,"lon")->valueint;
 					  //test1 = cJSON_GetObjectItem(root,"lat")->valuedouble;
@@ -147,10 +164,10 @@ void odroid_loc_init() {
 					  gps.ecef_pos.y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
 					  gps.ecef_pos.z = cJSON_GetObjectItem(root,"ecefposz")->valueint;;
 
-					  gps.ecef_vel.x = vel_x;
-					  gps.ecef_vel.y = vel_y;
-					  gps.ecef_vel.z = 0;
-
+					  //gps.ecef_vel.x = vel_x;
+					  //gps.ecef_vel.y = vel_y;
+					  //gps.ecef_vel.z = 0;
+/*
 					  gps.course = 100;
 					  gps.num_sv = 11;
 					  gps.tow = 0;
@@ -166,7 +183,7 @@ void odroid_loc_init() {
 				      gps.last_3dfix_time = sys_time.nb_sec;
 				    }
 				    AbiSendMsgGPS(GPS_DATALINK_ID, now_ts, &gps);
-
+*/
 					/*
 					IvySendMsg("0 REMOTE_GPS %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 201,
 					      1,                //uint8 Number of markers (sv_num)
@@ -183,6 +200,8 @@ void odroid_loc_init() {
 					      0,
 					      (int)(20));             //int32 Course in rad*1e7
 */
+
+
 					writeLocationInput=0;
 				}
 			}
@@ -203,14 +222,17 @@ void odroid_loc_init() {
 	cJSON_AddNumberToObject(droneInformation, "accel_x", ins_int.ltp_accel.x);
 	cJSON_AddNumberToObject(droneInformation, "accel_y", ins_int.ltp_accel.y);
 	cJSON_AddNumberToObject(droneInformation, "ultrasound", navdata.measure.ultrasound);
+	cJSON_AddNumberToObject(droneInformation, "baroz", ins_int.baro_z);
 	cJSON_AddNumberToObject(droneInformation, "gpsx", gps.ecef_pos.x);
 	cJSON_AddNumberToObject(droneInformation, "gpsy", gps.ecef_pos.y);
 	cJSON_AddNumberToObject(droneInformation, "gpsz", gps.ecef_pos.z);
 	cJSON_AddNumberToObject(droneInformation, "opticflowvelx", vel_x);
 	cJSON_AddNumberToObject(droneInformation, "opticflowvely", vel_y);
 
-
-
+/*
+	gps.ecef_vel.x = vel_x;
+	gps.ecef_vel.y = vel_y;
+*/
 
 	cJSON_AddNumberToObject(root, "mustReset", resetOdroid);
 
