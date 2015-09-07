@@ -228,6 +228,20 @@ void odroid_loc_init() {
 	cJSON_AddNumberToObject(droneInformation, "gpsz", gps.ecef_pos.z);
 	cJSON_AddNumberToObject(droneInformation, "opticflowvelx", vel_x);
 	cJSON_AddNumberToObject(droneInformation, "opticflowvely", vel_y);
+
+	cJSON_AddNumberToObject(droneInformation, "optitrack_lat", optitrack_lat);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_lon", optitrack_lon);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_alt", optitrack_alt);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_hmsl", optitrack_hmsl);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_ecef_x", optitrack_ecef_x);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_ecef_y", optitrack_ecef_y);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_ecef_z", optitrack_ecef_z);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_ecef_xd", optitrack_ecef_xd);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_ecef_yd", optitrack_ecef_yd);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_ecef_zd", optitrack_ecef_zd);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_course", optitrack_course);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_numsv", optitrack_numsv);
+	cJSON_AddNumberToObject(droneInformation, "optitrack_tow", optitrack_tow);
 	gps.lla_pos.lat = optitrack_lat;
 	  gps.lla_pos.lon = optitrack_lon;
 	 gps.lla_pos.alt = optitrack_alt;
