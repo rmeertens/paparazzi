@@ -63,10 +63,11 @@
 
 float test1=23.0;
 float test2 = 24.0;
+int32_t vo_ecef_x=25, vo_ecef_y=26, vo_ecef_z=27;
 int timesRest = 100;
 static void send_odometry(struct transport_tx *trans, struct link_device *dev)
 {
-    pprz_msg_send_ODOMETRY(trans, dev, AC_ID, &test1,&test2);
+    pprz_msg_send_ODOMETRY(trans, dev, AC_ID, &test1,&test2,&vo_ecef_x,&vo_ecef_y,&vo_ecef_z,&optitrack_ecef_x,&optitrack_ecef_y,&optitrack_ecef_z);
     //DOWNLINK_SEND_ODOMETRY (DefaultChannel, DefaultDevice,3.0,4.0);
 }
 
@@ -143,12 +144,29 @@ void odroid_loc_init() {
 					}
 					float xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
 					float yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
-
+                    vo_ecef_x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
+                    vo_ecef_y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
+                    vo_ecef_z = cJSON_GetObjectItem(root,"ecefposz")->valueint;
+                    gps.ecef_pos.x = vo_ecef_x;
+                    gps.ecef_pos.y = vo_ecef_y;
+                    gps.ecef_pos.z = vo_ecef_z;
 					printf("x: %d\n",xValue);
 					printf("y: %d\n",yValue);
 					printf("^^^^^\n");
 						test1 = xValue;
 				test2 = yValue;
+            //    gps.fix = GPS_FIX_3D;
+/*
+                GpsFixValid();
+            // publish new GPS data
+              uint32_t now_ts = get_sys_time_usec();
+              gps.last_msg_ticks = sys_time.nb_sec_rem;
+              gps.last_msg_time = sys_time.nb_sec;
+              if (gps.fix == GPS_FIX_3D) {
+                gps.last_3dfix_ticks = sys_time.nb_sec_rem;
+                gps.last_3dfix_time = sys_time.nb_sec;
+              }
+              AbiSendMsgGPS(GPS_DATALINK_ID, now_ts, &gps);
 /*
 				 gps.ecef_pos.x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
 					  gps.ecef_pos.y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
@@ -171,18 +189,7 @@ void odroid_loc_init() {
 					  gps.course = 100;
 					  gps.num_sv = 11;
 					  gps.tow = 0;
-					  gps.fix = GPS_FIX_3D;
 
-					  GpsFixValid();
-				  // publish new GPS data
-				    uint32_t now_ts = get_sys_time_usec();
-				    gps.last_msg_ticks = sys_time.nb_sec_rem;
-				    gps.last_msg_time = sys_time.nb_sec;
-				    if (gps.fix == GPS_FIX_3D) {
-				      gps.last_3dfix_ticks = sys_time.nb_sec_rem;
-				      gps.last_3dfix_time = sys_time.nb_sec;
-				    }
-				    AbiSendMsgGPS(GPS_DATALINK_ID, now_ts, &gps);
 */
 					/*
 					IvySendMsg("0 REMOTE_GPS %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 201,
@@ -248,9 +255,9 @@ void odroid_loc_init() {
 
 	  gps.hmsl        = optitrack_hmsl;
 
-	  gps.ecef_pos.x = optitrack_ecef_x;
+    /*  gps.ecef_pos.x = optitrack_ecef_x;
 	  gps.ecef_pos.y = optitrack_ecef_y;
-	  gps.ecef_pos.z = optitrack_ecef_z;
+      gps.ecef_pos.z = optitrack_ecef_z;*/
 	  gps.ecef_vel.x = optitrack_ecef_xd;
 	  gps.ecef_vel.y = optitrack_ecef_yd;
 	  gps.ecef_vel.z = optitrack_ecef_zd;

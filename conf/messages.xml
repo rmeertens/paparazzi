@@ -2113,6 +2113,12 @@
   <message name="ODOMETRY" id="245">
     <field name="posx"   type="float" unit="m"/>
     <field name="posy"   type="float" unit="m"/>
+    <field name="vo_ecef_x"  type="int32" unit="cm"   alt_unit="m"/>
+    <field name="vo_ecef_y"  type="int32" unit="cm"   alt_unit="m"/>
+    <field name="vo_ecef_z"  type="int32" unit="cm"   alt_unit="m"/>
+    <field name="real_ecef_x"  type="int32" unit="cm"   alt_unit="m"/>
+    <field name="real_ecef_y"  type="int32" unit="cm"   alt_unit="m"/>
+    <field name="real_ecef_z"  type="int32" unit="cm"   alt_unit="m"/>
   </message>
 
  <!-- 246 is free -->
