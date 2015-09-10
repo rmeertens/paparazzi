@@ -28,10 +28,16 @@
 
   <modules main_freq="512">
     <load name="bat_voltage_ardrone2.xml"/>
-	<load name="cv_opticflow.xml">
+	<!--<load name="cv_opticflow.xml">
 <define name="CMD_OF_SAT" value="1500"/>
-</load>
-	<load name="readlocationfromodroid.xml"/>
+</load>-->
+<!--	<load name="readlocationfromodroid.xml"/>-->
+	<load name="readmultigazeodroid.xml">
+		<define name="EXPECTED_WIDTH" value="36"/>
+		<define name="EXPECTED_HEIGHT" value="6"/>
+		<define name="LENGTH_READ_BUFFER" value="50000"/>
+
+	</load>
 <!--load name="read_matrix_serial.xml"/-->
   </modules>
 

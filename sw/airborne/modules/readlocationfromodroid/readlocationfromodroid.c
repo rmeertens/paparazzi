@@ -36,8 +36,8 @@
 #include <string.h>
 #include "state.h"
 #include "subsystems/gps.h"
-
-#include "cJSON.h"
+#include "/home/roland/paparazzi/sw/ext/cJSON/cJSON.h"
+//#include "cJSON.h"
 #include "navdata.h"
 #include "subsystems/ins/ins_int.h"
 #include "subsystems/datalink/telemetry.h"

@@ -19,11 +19,13 @@
   <periodic fun="odroid_loc_periodic()" freq="10" autorun="TRUE"/>
   <makefile>
     <file name="readlocationfromodroid.c"/>
-    <file name="cJSON.c"/>
+    <!--<file name="cJSON.c"/-->
+    <file name="cJSON.c" dir="/home/roland/paparazzi/sw/ext/cJSON"/>
    <!-- <file name="subsystems/gps.c"/>
     <define name="USE_GPS"/>
     <define name="GPS_TYPE_H" value="modules/readlocationfromodroid/readlocationfromodroid.h"/>-->
 	<!--<file name="ivy.c"/>-->
   </makefile>
+
 </module>
 

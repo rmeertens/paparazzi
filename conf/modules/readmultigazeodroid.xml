@@ -1,0 +1,20 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="readmultigazeodroid">
+  <doc>
+    <description>reads the multigaze data over serial</description>
+  <define name="EXPECTED_WIDTH" value="36"/>
+  <define name="EXPECTED_HEIGHT" value="6"/>
+  </doc>
+  
+  <header>
+    <file name="readmultigazeodroid.h"/>
+  </header>
+  <init fun="mgread_init()"/>
+  <periodic fun="mgread_periodic()" freq="100"/>
+  <makefile>
+    <file name="readmultigazeodroid.c"/>
+    <file name="cJSON.c" dir="/home/roland/paparazzi/sw/ext/cJSON"/>
+  </makefile>
+</module>
+
