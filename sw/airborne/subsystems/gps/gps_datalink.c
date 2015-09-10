@@ -58,7 +58,7 @@ void parse_gps_datalink(uint8_t numsv, int32_t ecef_x, int32_t ecef_y, int32_t e
 	optitrack_ecef_zd = ecef_zd;
 	optitrack_course = course;
 	optitrack_tow = tow;
-/*
+
 printf("PARSING!!!\n");
   gps.lla_pos.lat = lat;
   gps.lla_pos.lon = lon;
@@ -77,7 +77,7 @@ printf("PARSING!!!\n");
   gps.num_sv = numsv;
   gps.tow = tow;
   gps.fix = GPS_FIX_3D;
-*/
+
 #if GPS_USE_LATLONG
   // Computes from (lat, long) in the referenced UTM zone
   struct LlaCoor_f lla_f;

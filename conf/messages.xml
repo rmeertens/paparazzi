@@ -2119,7 +2119,13 @@
     <field name="real_ecef_x"  type="int32" unit="cm"   alt_unit="m"/>
     <field name="real_ecef_y"  type="int32" unit="cm"   alt_unit="m"/>
     <field name="real_ecef_z"  type="int32" unit="cm"   alt_unit="m"/>
-  </message>
+	<field name="real_vx"  type="int32" unit="cm"   alt_unit="m/s"/>
+	<field name="real_vy"  type="int32" unit="cm"   alt_unit="m/s"/>
+        <field name="vo_vx"  type="float" unit="m/s"   alt_unit="m/s"/>
+        <field name="vo_vy"  type="float" unit="m/s"   alt_unit="m/s"/>
+        
+ 
+ </message>
 
  <!-- 246 is free -->
 

@@ -36,6 +36,7 @@
 #include <string.h>
 #include "state.h"
 #include "subsystems/gps.h"
+
 #include "cJSON.h"
 #include "navdata.h"
 #include "subsystems/ins/ins_int.h"
@@ -64,10 +65,11 @@
 float test1=23.0;
 float test2 = 24.0;
 int32_t vo_ecef_x=25, vo_ecef_y=26, vo_ecef_z=27;
+float vo_xd=0.0,vo_yd=0.0;
 int timesRest = 100;
 static void send_odometry(struct transport_tx *trans, struct link_device *dev)
 {
-    pprz_msg_send_ODOMETRY(trans, dev, AC_ID, &test1,&test2,&vo_ecef_x,&vo_ecef_y,&vo_ecef_z,&optitrack_ecef_x,&optitrack_ecef_y,&optitrack_ecef_z);
+    pprz_msg_send_ODOMETRY(trans, dev, AC_ID, &test1,&test2,&vo_ecef_x,&vo_ecef_y,&vo_ecef_z,&optitrack_ecef_x,&optitrack_ecef_y,&optitrack_ecef_z,&optitrack_ecef_xd,&optitrack_ecef_yd,&vo_xd,&vo_yd);
     //DOWNLINK_SEND_ODOMETRY (DefaultChannel, DefaultDevice,3.0,4.0);
 }
 
@@ -102,9 +104,9 @@ void odroid_loc_init() {
 	printf("Loc periodic! %d", writeLocationInput);
 	char justRead='a';
 
-	if (writeLocationInput > 900)
+	if (writeLocationInput > 10000)
 		writeLocationInput = 0;
-	int n = read(  READING_port->fd, &serialResponse[writeLocationInput], 1000);
+	int n = read(  READING_port->fd, &serialResponse[writeLocationInput], 3000);
 	//printf("Read %d bytes\n",n);
 	if (n < 0)
 	{
@@ -117,44 +119,60 @@ void odroid_loc_init() {
 		int index=0;
 		//printf("Now read bytes %d string: %s\n",strlen(serialResponse),serialResponse);
 		int start=-1;
-		for(index=0; index < n; index++){
+		for(index=0; index < writeLocationInput; index++){
 
 			//printf("%c",serialResponse[index]);
 			if(serialResponse[index]=='{'){
 				start=index;
 				printf("Encountered start");
 			}
-			if(serialResponse[index]=='\n' && start >=0)
+
+			if(serialResponse[index]=='#' && start >=0)
 			{
-
-				printf("Encountered end");
-				char subbuf[index];
-				memcpy(subbuf,&serialResponse[start],index-start);
-				subbuf[index]='\0';
-				printf("Read now: %s\n",subbuf);
-				if(subbuf[0]=='{' && subbuf[index-1]=='}'){
-
+				int lengthMessage=index-start;
+				char subbuf[lengthMessage];
+				printf("Read now actually:\n");
+				int indexPrint = 0;
+				int indexSubbuf=0;
+				for (indexPrint = start;indexPrint < index; indexPrint++){
+					printf("%c",serialResponse[indexPrint]);
+					subbuf[indexSubbuf++]=serialResponse[indexPrint];
+				}
+				printf("\n\nDone, now subbuf is: %s\nsubbuf[0]=%c && subbuf[lengthMessage]=%c\n",subbuf,subbuf[0],subbuf[lengthMessage-1]);
+				if(subbuf[0]=='{' && subbuf[lengthMessage-1]=='}'){
+					printf("\naww yeah\n");
 					cJSON * root = cJSON_Parse(subbuf);
-					printf("result json: \n");
+
+					cJSON *array = cJSON_GetObjectItem(root,"array");
+
+					int lengthArray = cJSON_GetArraySize(array);
+
+					for (indexPrint = 0;indexPrint < lengthArray; indexPrint++){
+						printf("%d, ",cJSON_GetArrayItem(array,indexPrint)->valueint);
+					}
+					printf("\n");
 					printf(cJSON_PrintUnformatted(root));
 					printf("\n");
-					int receivedReset = cJSON_GetObjectItem(root,"receivedReset")->valueint;
-					if (resetOdroid && receivedReset){
-							resetOdroid=0;
-					}
-					float xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
-					float yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
-                    vo_ecef_x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
-                    vo_ecef_y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
-                    vo_ecef_z = cJSON_GetObjectItem(root,"ecefposz")->valueint;
-                    gps.ecef_pos.x = vo_ecef_x;
-                    gps.ecef_pos.y = vo_ecef_y;
-                    gps.ecef_pos.z = vo_ecef_z;
-					printf("x: %d\n",xValue);
-					printf("y: %d\n",yValue);
-					printf("^^^^^\n");
-						test1 = xValue;
-				test2 = yValue;
+//					int receivedReset = cJSON_GetObjectItem(root,"receivedReset")->valueint;
+//
+//					if (resetOdroid && receivedReset){
+//							resetOdroid=0;
+//					}
+//					float xValue = cJSON_GetObjectItem(root,"x")->valuedouble;
+//					float yValue = cJSON_GetObjectItem(root,"y")->valuedouble;
+//                    vo_ecef_x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
+//                    vo_ecef_y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
+//                    vo_ecef_z = cJSON_GetObjectItem(root,"ecefposz")->valueint;
+//                    vo_xd = cJSON_GetObjectItem(root,"vovx")->valuedouble;
+//                    vo_yd = cJSON_GetObjectItem(root,"vovy")->valuedouble;
+//                    gps.ecef_pos.x = vo_ecef_x;
+//                    gps.ecef_pos.y = vo_ecef_y;
+//                    gps.ecef_pos.z = vo_ecef_z;
+//					printf("x: %d\n",xValue);
+//					printf("y: %d\n",yValue);
+//					printf("^^^^^\n");
+//						test1 = xValue;
+//				test2 = yValue;
             //    gps.fix = GPS_FIX_3D;
 /*
                 GpsFixValid();
@@ -180,7 +198,7 @@ void odroid_loc_init() {
 					  gps.hmsl        = 125;
 					  gps.ecef_pos.x = cJSON_GetObjectItem(root,"ecefposx")->valueint;
 					  gps.ecef_pos.y = cJSON_GetObjectItem(root,"ecefposy")->valueint;
-					  gps.ecef_pos.z = cJSON_GetObjectItem(root,"ecefposz")->valueint;;
+					  gps.ecef_pos.z = cJSON_GetObjectItem(root,"ecefposz")->valueint;
 
 					  //gps.ecef_vel.x = vel_x;
 					  //gps.ecef_vel.y = vel_y;
