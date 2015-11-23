@@ -12,6 +12,7 @@
 
 #include "modules/follow_egg/follow_egg.h"
 #include "modules/stereo_cam/stereocam.h"
+#include "generated/flight_plan.h"
 
 #include "subsystems/abi.h"
 #ifndef VISION_VELOCITY_ESTIMATE_ID
@@ -19,7 +20,7 @@
 #endif
 PRINT_CONFIG_VAR(VISION_VELOCITY_ESTIMATE_ID)
 static abi_event velocity_est_ev;
-
+#define M_PI 3.14159265358979323846
 #include "guidance.h"
 // Paparazzi Data
 #include "state.h"
@@ -43,7 +44,34 @@ void follow_egg_init() {
 	 AbiBindMsgVELOCITY_ESTIMATE(VISION_VELOCITY_ESTIMATE_ID, &velocity_est_ev, new_velocity_estimate);
 
 }
+int32_t latestVelRefX=0;
+int32_t latestVelRefY=0;
+int setVelocityReference(float forward, float sideways){
+	printf("Setting velocity reference\n");
+	float newHeading =stateGetNedToBodyEulers_f()->psi;
+	nav_set_heading_rad(newHeading);
+
+	float sin_heading_forward = sinf(ANGLE_FLOAT_OF_BFP(nav_heading));
+	float cos_heading_forward = cosf(ANGLE_FLOAT_OF_BFP(nav_heading));
+	int newPosX = POS_BFP_OF_REAL(sin_heading_forward * forward);
+	int newPosY = POS_BFP_OF_REAL(cos_heading_forward * forward);
+//	float sin_heading_sideways = sinf(ANGLE_FLOAT_OF_BFP(nav_heading)+M_PI/2);
+//	float cos_heading_sideways = cosf(ANGLE_FLOAT_OF_BFP(nav_heading)+M_PI/2);
+//	newPosX+=POS_BFP_OF_REAL(sin_heading_sideways * sideways);
+//	newPosY+=POS_BFP_OF_REAL(cos_heading_sideways * sideways);
+	navigation_carrot.x=newPosX;
+	navigation_carrot.y=newPosY;
+	latestVelRefX=newPosX;
+	latestVelRefY=newPosY;
+	return 1;
+}
 void set_heading_following_egg() {
+	  nav_altitude = waypoints[WP_p1].enu_i.z;
+	  waypoints[WP_p1].x = stateGetPositionEnu_f()->x; \
+	     waypoints[WP_p1].y = stateGetPositionEnu_f()->y; \
+	     waypoints[WP_p1].a = stateGetPositionEnu_f()->z + ground_alt; \
+//	navigation_carrot.x=latestVelRefX;
+//	navigation_carrot.y=latestVelRefY;
 	if(stereocam_data.fresh){
 		printf("Set heading Egg follow");
 		stereocam_data.fresh=0;
@@ -100,12 +128,7 @@ void set_heading_following_egg() {
 
 		float newHeading =stateGetNedToBodyEulers_f()->psi+heading_change;
 		nav_set_heading_rad(newHeading);
-		float sin_heading = sinf(ANGLE_FLOAT_OF_BFP(nav_heading));
-		float cos_heading = cosf(ANGLE_FLOAT_OF_BFP(nav_heading));
-		int newPosX = POS_BFP_OF_REAL(sin_heading * 1.5);
-		int newPosY = POS_BFP_OF_REAL(cos_heading * 1.5);
-		navigation_carrot.x=newPosX;
-		navigation_carrot.y=newPosY;
+
 
 
 	}

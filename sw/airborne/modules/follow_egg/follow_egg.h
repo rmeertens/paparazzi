@@ -14,5 +14,7 @@
 #define FOLLOW_EGG_H
 extern void follow_egg_init(void);
 extern void set_heading_following_egg(void);
+extern int setVelocityReference(float, float);
+
 #endif
 
