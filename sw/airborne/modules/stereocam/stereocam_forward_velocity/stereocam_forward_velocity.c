@@ -26,7 +26,7 @@
 #define CLOSE_DISPARITY 33
 #define DANGEROUS_CLOSE_DISTANCE 1.0
 #define CLOSE_DISTANCE 2.0
-#define LOW_AMOUNT_PIXELS_IN_DROPLET 20
+#define LOW_AMOUNT_PIXELS_IN_DROPLET 30
 
 
 float ref_pitch=0.0;
@@ -61,7 +61,7 @@ float sumVelocities=0.0;
 
 float sumHorizontalVelocities=0.0;
 
-typedef enum{GO_FORWARD,STABILISE,TURN} avoidance_phase;
+typedef enum{GO_FORWARD,STABILISE,TURN,INIT_FORWARD} avoidance_phase;
 avoidance_phase current_state=GO_FORWARD;
 int totalStabiliseStateCount = 0;
 int totalTurningSeenNothing=0;
@@ -85,6 +85,7 @@ float someGainWhenDoingNothing=0.0;
 
 float somePitchGainWhenDoingNothing=0.0;
 float previousStabPitch=0.0;
+int stabPositionCount=0;
 void stereocam_forward_velocity_init()
 {
 	stabilisationLateralGains.pGain=0.6;
@@ -182,7 +183,7 @@ void stereocam_forward_velocity_periodic()
     ref_roll=0.0;
     if(autopilot_mode != AP_MODE_NAV){
     	 ref_alt= -state.ned_pos_f.z;
-    	 ref_disparity_to_keep=CLOSE_DISPARITY;
+    	 ref_disparity_to_keep=CLOSE_DISPARITY-5;
     	 current_state=TURN;
     	 headingStereocamStab=ANGLE_FLOAT_OF_BFP(INT32_DEG_OF_RAD(stab_att_sp_euler.psi));
     	 roll_compensation=ANGLE_FLOAT_OF_BFP(stab_att_sp_euler.phi);
@@ -194,21 +195,21 @@ void stereocam_forward_velocity_periodic()
     previousLateralSpeed=guidoVelocityHor;
     counterStab++;
     if(current_state==GO_FORWARD){
+		ref_pitch=-0.1;
     	if(avoidStrategy==USE_CLOSEST_DISPARITY){
-			if(closest>DANGEROUS_CLOSE_DISPARITY){
+			if(dist < DANGEROUS_CLOSE_DISTANCE){
 				ref_pitch=0.2;
 				detectedWall=1;
 			}
-			else if(closest>CLOSE_DISPARITY){
+			else if(dist < CLOSE_DISTANCE){
 				ref_pitch=0.1;
 				detectedWall=1;
 			}
     	}
     	else{
-    		if(disparitiesInDroplet>30){
-    			ref_pitch=0.0;
+    		if(disparitiesInDroplet>LOW_AMOUNT_PIXELS_IN_DROPLET){
+    			ref_pitch=0.1;
     			detectedWall=1;
-    			ref_disparity_to_keep=CLOSE_DISPARITY;
     		}
     	}
 
@@ -226,10 +227,7 @@ void stereocam_forward_velocity_periodic()
 				ref_roll=rollToTake;
 			}
 		}
-		ref_pitch=-0.1;
-
-
-		if(closest < DANGEROUS_CLOSE_DISPARITY && detectedWall){
+		if(closest < DANGEROUS_CLOSE_DISPARITY && detectedWall&& closest>0){
 			totalTurningSeenNothing=0;
 			current_state=STABILISE;
 			totalStabiliseStateCount=0;
@@ -238,8 +236,8 @@ void stereocam_forward_velocity_periodic()
 
     }
     else if(current_state==STABILISE){
-
-    	float stab_pitch_pgain=0.08;
+    	totalStabiliseStateCount++;
+    	float stab_pitch_pgain=0.1;
     	float pitchDiff = closest- ref_disparity_to_keep;
     	float pitchToTake = stab_pitch_pgain*pitchDiff;
 
@@ -282,18 +280,26 @@ void stereocam_forward_velocity_periodic()
 			ref_roll=0.5*previousStabRoll;
 		}
 
-		if(guidoVelocityHor<0.25 && guidoVelocityHor>-0.25){
+		if(abs(closest- ref_disparity_to_keep)<5){
+			stabPositionCount++;
+		}
+		else{
+			stabPositionCount=0;
+		}
+		if(guidoVelocityHor<0.25 && guidoVelocityHor>-0.25 && totalStabiliseStateCount>10){
 
-			if(closest < CLOSE_DISPARITY){
+			if(stabPositionCount>20){
 				current_state=TURN;
 				indexTurnFactors=0;
+				stabPositionCount=0;
 			}
 		}
        }
     else if(current_state==TURN){
     	ref_pitch=0.0;
     	ref_roll=0.0;
-    	headingStereocamStab += 4.0;
+
+    	headingStereocamStab += 5.0;
     	  if (headingStereocamStab > 360.0)
     		  headingStereocamStab -= 360.0;
     	indexTurnFactors+=1;
@@ -302,7 +308,7 @@ void stereocam_forward_velocity_periodic()
     	}
     	if(indexTurnFactors > 3){
     		if(avoidStrategy==USE_CLOSEST_DISPARITY){
-    			if(closest<CLOSE_DISPARITY){
+    			if(closest<CLOSE_DISPARITY && closest>0){
 					totalTurningSeenNothing++;
 					if(totalTurningSeenNothing>2){
 						current_state=GO_FORWARD;
@@ -313,10 +319,10 @@ void stereocam_forward_velocity_periodic()
     		else{
     			if(disparitiesInDroplet<LOW_AMOUNT_PIXELS_IN_DROPLET){
     				totalTurningSeenNothing++;
-					if(totalTurningSeenNothing>2){
+//					if(totalTurningSeenNothing>2){
 						current_state=GO_FORWARD;
 						detectedWall=0;
-					}
+//					}
     			}
     		}
     	}
