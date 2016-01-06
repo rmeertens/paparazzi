@@ -19,13 +19,18 @@
 #include "firmwares/rotorcraft/guidance/guidance_h.h"
 #include "subsystems/datalink/telemetry.h"
 #include "firmwares/rotorcraft/stabilization/stabilization_attitude_quat_int.h"
+#include "generated/flight_plan.h"
 
 #define AVERAGE_VELOCITY 0
-// Know waypoint numbers and blocks
-#include "generated/flight_plan.h"
- float ref_pitch=0.0;
- float ref_roll=0.0;
+#define DANGEROUS_CLOSE_DISPARITY 40
+#define CLOSE_DISPARITY 33
+#define DANGEROUS_CLOSE_DISTANCE 1.0
+#define CLOSE_DISTANCE 2.0
+#define LOW_AMOUNT_PIXELS_IN_DROPLET 20
 
+
+float ref_pitch=0.0;
+float ref_roll=0.0;
 
  struct Gains{
 	 float pGain;
@@ -41,7 +46,8 @@ int turnFactors[]={300,300,300,200,100,100,100,100};
 int countFactorsTurning=6;
 int indexTurnFactors=0;
 
-
+// Forward velocity estimation
+#define LENGTH_VELOCITY_HISTORY 6
 int disparity_velocity_step = 0;
 int disparity_velocity_max_time = 500;
 int distancesRecorded = 0;
@@ -49,26 +55,21 @@ int timeStepsRecorded = 0;
 int velocity_disparity_outliers = 0;
 float distancesHistory[500];
 float timeStepHistory[500];
-#define LENGTH_VELOCITY_HISTORY 6
 float velocityHistory[LENGTH_VELOCITY_HISTORY];
 int indexVelocityHistory=0;
 float sumVelocities=0.0;
 
 float sumHorizontalVelocities=0.0;
-uint8_t GO_FORWARD=0;
-uint8_t STABILISE=1;
-uint8_t TURN=2;
-uint8_t INIT_FORWARD=3;
-uint8_t current_state=2;
+
+typedef enum{GO_FORWARD,STABILISE,TURN} avoidance_phase;
+avoidance_phase current_state=GO_FORWARD;
 int totalStabiliseStateCount = 0;
 int totalTurningSeenNothing=0;
 float previousLateralSpeed = 0.0;
 uint8_t detectedWall=0;
 float velocityAverageAlpha = 0.65;
 float previousHorizontalVelocity = 0.0;
-#define DANGEROUS_CLOSE_DISPARITY 40
-#define CLOSE_DISPARITY 33
-#define LOW_AMOUNT_PIXELS_IN_DROPLET 20
+
 float ref_disparity_to_keep=40.0;
 float pitch_compensation = 0.0;
 float roll_compensation=0.0;
@@ -77,8 +78,8 @@ int goForwardXStages=3;
 int counterStab=0;
 float previousStabRoll=0.0;
 float ref_alt=1.0;
-typedef enum{USE_DROPLET,USE_CLOSEST_DISPARITY} something;
-something sf = USE_DROPLET;
+typedef enum{USE_DROPLET,USE_CLOSEST_DISPARITY} avoid_strategy_type;
+avoid_strategy_type avoidStrategy = USE_DROPLET;
 float headingStereocamStab=0.0;
 float someGainWhenDoingNothing=0.0;
 
@@ -154,12 +155,6 @@ void stereocam_forward_velocity_periodic()
 {
 
   if (stereocam_data.fresh && stereocam_data.len>20) {
-//	  if (autopilot_mode != AP_MODE_NAV) {
-//
-//	  		  struct Int32Eulers *euler = stateGetNedToBodyEulers_i();
-//	  		  nav_set_heading_rad(ANGLE_FLOAT_OF_BFP(euler->psi));
-//	  	//heading=;
-//	  }
     stereocam_data.fresh = 0;
 	uint8_t closest = stereocam_data.data[4];
 
@@ -182,22 +177,12 @@ void stereocam_forward_velocity_periodic()
     guidoVelocityHor = guidoVelocityHorStereoboard*velocityAverageAlpha + (1-velocityAverageAlpha)*previousHorizontalVelocity;
     sumHorizontalVelocities+=guidoVelocityHor;
     previousHorizontalVelocity= guidoVelocityHorStereoboard;
-
-    int timeStamp = 0;
     //float guidoVelocityZ = upDownVelocity/100.0;
-    float guidoVelocityZ=0.0;
-    float noiseUs = 0.3f;
-/*
-    AbiSendMsgVELOCITY_ESTIMATE(STEREO_VELOCITY_ID, timeStamp, velocityFound, guidoVelocityHor,
-                                guidoVelocityZ,
-                                noiseUs);*/
 	ref_pitch=0.0;
     ref_roll=0.0;
     if(autopilot_mode != AP_MODE_NAV){
     	 ref_alt= -state.ned_pos_f.z;
-    	 ref_disparity_to_keep=30;//closest;
-    	// someGainWhenDoingNothing=0.0;
-    	 //somePitchGainWhenDoingNothing=0.0;
+    	 ref_disparity_to_keep=CLOSE_DISPARITY;
     	 current_state=TURN;
     	 headingStereocamStab=ANGLE_FLOAT_OF_BFP(INT32_DEG_OF_RAD(stab_att_sp_euler.psi));
     	 roll_compensation=ANGLE_FLOAT_OF_BFP(stab_att_sp_euler.phi);
@@ -209,7 +194,7 @@ void stereocam_forward_velocity_periodic()
     previousLateralSpeed=guidoVelocityHor;
     counterStab++;
     if(current_state==GO_FORWARD){
-    	if(sf==USE_CLOSEST_DISPARITY){
+    	if(avoidStrategy==USE_CLOSEST_DISPARITY){
 			if(closest>DANGEROUS_CLOSE_DISPARITY){
 				ref_pitch=0.2;
 				detectedWall=1;
@@ -290,52 +275,33 @@ void stereocam_forward_velocity_periodic()
 			previousStabPitch=ref_pitch;
 
 
-			if(guidoVelocityHor<0.25 && guidoVelocityHor>-0.25){
 
-				if(closest < CLOSE_DISPARITY){
-					current_state=TURN;
-					indexTurnFactors=0;
-				}
-			}
 		}
 		else{
-//			ref_pitch=somePitchGainWhenDoingNothing;
 			ref_pitch=0.5*previousStabPitch;
 			ref_roll=0.5*previousStabRoll;
-//			ref_roll=someGainWhenDoingNothing;
 		}
 
-		//ref_roll=0.0;
-//    	if(guidoVelocityHor<0.5 && guidoVelocityHor>-0.5){
-    	//	if(sf==USE_CLOSEST_DISPARITY){
-	//			if(closest < CLOSE_DISPARITY){
-	//				current_state=TURN;
-	//				indexTurnFactors=0;
-	//			}
-//    		}
-//    		else{
-//    			if(disparitiesInDroplet<LOW_AMOUNT_PIXELS_IN_DROPLET){
-//    				current_state=TURN;
-//    				indexTurnFactors=0;
-//    			}
-//    		}
-   // 	}
+		if(guidoVelocityHor<0.25 && guidoVelocityHor>-0.25){
 
+			if(closest < CLOSE_DISPARITY){
+				current_state=TURN;
+				indexTurnFactors=0;
+			}
+		}
        }
     else if(current_state==TURN){
     	ref_pitch=0.0;
     	ref_roll=0.0;
-    	headingStereocamStab += 6.0;
+    	headingStereocamStab += 4.0;
     	  if (headingStereocamStab > 360.0)
     		  headingStereocamStab -= 360.0;
-
-    	//increase_nav_heading(&nav_heading,turnFactors[indexTurnFactors]);
     	indexTurnFactors+=1;
     	if(indexTurnFactors>countFactorsTurning){
     		indexTurnFactors = countFactorsTurning;
     	}
     	if(indexTurnFactors > 3){
-    		if(sf==USE_CLOSEST_DISPARITY){
+    		if(avoidStrategy==USE_CLOSEST_DISPARITY){
     			if(closest<CLOSE_DISPARITY){
 					totalTurningSeenNothing++;
 					if(totalTurningSeenNothing>2){
@@ -359,14 +325,6 @@ void stereocam_forward_velocity_periodic()
     	}
 
     }
-    else if(current_state==INIT_FORWARD){
-    	ref_pitch=-0.25;
-    	initFastForwardCount++;
-    	if(initFastForwardCount >= goForwardXStages){
-    		initFastForwardCount = 0;
-    		current_state=GO_FORWARD;
-    	}
-     }
     else{
     	current_state=GO_FORWARD;
     }
@@ -376,6 +334,5 @@ void stereocam_forward_velocity_periodic()
     ref_roll += roll_compensation;
     DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &disparitiesInDroplet,&dist, &velocityFound,&guidoVelocityHor,&ref_disparity_to_keep,&current_state,&guidance_h_trim_att_integrator.x);
     DOWNLINK_SEND_REFROLLPITCH(DefaultChannel, DefaultDevice, &somePitchGainWhenDoingNothing,&ref_pitch);
-//*/
   }
 }
