@@ -90,7 +90,7 @@ int stabPositionCount=0;
 float max_roll_forward=0.25;
 void stereocam_forward_velocity_init()
 {
-	stabilisationLateralGains.pGain=0.6;
+	stabilisationLateralGains.pGain=0.5;
 	stabilisationLateralGains.dGain=0.05;
 	stabilisationLateralGains.iGain=0.01;
 	forwardLateralGains.pGain=0.6;
@@ -236,10 +236,10 @@ void stabilisationFunction(uint8_t closest, float guidoVelocityHor) {
 	float rollToTake = stabilisationLateralGains.pGain * guidoVelocityHor;
 	rollToTake *= -1;
 
-	if (counterStab % 6 == 0) {
+	if (counterStab % 5 == 0) {
 		boundAngle(&rollToTake,max_roll_stab);
 		ref_roll=rollToTake;
-		boundAngle(&pitchToTake,0.1);
+		boundAngle(&pitchToTake,0.12);
 		ref_pitch=pitchToTake;
 
 		previousStabRoll = ref_roll;
@@ -247,8 +247,8 @@ void stabilisationFunction(uint8_t closest, float guidoVelocityHor) {
 		someGainWhenDoingNothing += 0.1 * ref_roll;
 		somePitchGainWhenDoingNothing += 0.1 * ref_pitch;
 	} else {
-		ref_pitch = 0.5 * previousStabPitch;
-		ref_roll = 0.5 * previousStabRoll;
+		ref_pitch = 0.4 * previousStabPitch;
+		ref_roll = 0.4 * previousStabRoll;
 	}
 	if (abs(closest - ref_disparity_to_keep) < 5) {
 		stabPositionCount++;
@@ -292,7 +292,7 @@ void stereocam_forward_velocity_periodic()
     // Set the velocity to either the average of the last few velocities, or take the current velocity with alpha times the previous one
     guidoVelocityHor = guidoVelocityHorStereoboard*velocityAverageAlpha + (1-velocityAverageAlpha)*previousHorizontalVelocity;
     sumHorizontalVelocities+=guidoVelocityHor;
-    previousHorizontalVelocity= guidoVelocityHor;
+    previousHorizontalVelocity= guidoVelocityHorStereoboard;
 
 	ref_pitch=0.0;
     ref_roll=0.0;
