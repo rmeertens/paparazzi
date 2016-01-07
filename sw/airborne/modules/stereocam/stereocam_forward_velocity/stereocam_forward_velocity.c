@@ -87,6 +87,7 @@ const float max_roll_stab = 0.25;
 float somePitchGainWhenDoingNothing=0.0;
 float previousStabPitch=0.0;
 int stabPositionCount=0;
+float max_roll_forward=0.25;
 void stereocam_forward_velocity_init()
 {
 	stabilisationLateralGains.pGain=0.6;
@@ -157,10 +158,11 @@ void increase_nav_heading(int32_t *headingToChange, int32_t increment)
 
 void boundAngle(float *angle, float maxAngle);
 void boundAngle(float *angle, float maxAngle){
-	if (*angle > maxAngle) {
-		*angle = maxAngle;
-	} else if (*angle < (-1.0 * maxAngle)) {
-		*angle = -(1.0 * maxAngle);
+	if ((*angle) > maxAngle) {
+		(*angle) = maxAngle;
+	}
+	else if ((*angle) < (-1.0 * maxAngle)) {
+		(*angle) = -(1.0 * maxAngle);
 	}
 }
 
@@ -184,19 +186,11 @@ void forwardFunction(uint8_t closest, float dist, int disparitiesInDroplet,float
 		}
 	}
 
-	float max_roll=0.25;
 	float rollToTake = forwardLateralGains.pGain * guidoVelocityHor;
 	rollToTake*=-1;
 	if(counterStab%4==0){
-		if(rollToTake>max_roll){
-			ref_roll=max_roll;
-		}
-		else if(rollToTake<(-1.0*max_roll)){
-			ref_roll=-(1.0*max_roll);
-		}
-		else{
-			ref_roll=rollToTake;
-		}
+		boundAngle(&rollToTake,max_roll_forward);
+		ref_roll=rollToTake;
 	}
 
 	if(closest < DANGEROUS_CLOSE_DISPARITY && detectedWall&& closest>0){
@@ -334,7 +328,8 @@ void stereocam_forward_velocity_periodic()
     nav_set_heading_deg(headingStereocamStab);
     ref_pitch += pitch_compensation;
     ref_roll += roll_compensation;
+    boundAngle(&ref_roll,0.2); boundAngle(&ref_pitch,0.2);
     DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &disparitiesInDroplet,&dist, &velocityFound,&guidoVelocityHor,&ref_disparity_to_keep,&current_state,&guidance_h_trim_att_integrator.x);
-    DOWNLINK_SEND_REFROLLPITCH(DefaultChannel, DefaultDevice, &somePitchGainWhenDoingNothing,&ref_pitch);
+    DOWNLINK_SEND_REFROLLPITCH(DefaultChannel, DefaultDevice, &ref_roll,&ref_pitch);
   }
 }
