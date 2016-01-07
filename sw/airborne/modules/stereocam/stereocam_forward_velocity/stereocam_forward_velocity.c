@@ -32,7 +32,7 @@
 float ref_pitch=0.0;
 float ref_roll=0.0;
 
- struct Gains{
+struct Gains{
 	 float pGain;
 	 float dGain;
 	 float iGain;
@@ -40,11 +40,9 @@ float ref_roll=0.0;
 typedef struct Gains gains;
 
 gains stabilisationLateralGains;
+gains stabilisationForwardGains;
 gains forwardLateralGains;
 
-int turnFactors[]={300,300,300,200,100,100,100,100};
-int countFactorsTurning=6;
-int indexTurnFactors=0;
 
 // Forward velocity estimation
 #define LENGTH_VELOCITY_HISTORY 6
@@ -85,7 +83,7 @@ typedef enum{USE_DROPLET,USE_CLOSEST_DISPARITY} avoid_strategy_type;
 avoid_strategy_type avoidStrategy = USE_DROPLET;
 float headingStereocamStab=0.0;
 float someGainWhenDoingNothing=0.0;
-
+const float max_roll_stab = 0.25;
 float somePitchGainWhenDoingNothing=0.0;
 float previousStabPitch=0.0;
 int stabPositionCount=0;
@@ -95,6 +93,7 @@ void stereocam_forward_velocity_init()
 	stabilisationLateralGains.dGain=0.05;
 	stabilisationLateralGains.iGain=0.01;
 	forwardLateralGains.pGain=0.6;
+	stabilisationForwardGains.pGain=0.1;
 }
 
 void array_pop(float *array, int lengthArray);
@@ -155,6 +154,53 @@ void increase_nav_heading(int32_t *headingToChange, int32_t increment)
 {
   *headingToChange = *headingToChange + increment;
 }
+
+void boundAngle(float *angle, float maxAngle);
+void boundAngle(float *angle, float maxAngle){
+	if (*angle > maxAngle) {
+		*angle = maxAngle;
+	} else if (*angle < (-1.0 * maxAngle)) {
+		*angle = -(1.0 * maxAngle);
+	}
+}
+
+void somethingsomething(uint8_t closest, float guidoVelocityHor) {
+	float pitchDiff = closest - ref_disparity_to_keep;
+	float pitchToTake = stabilisationForwardGains.pGain * pitchDiff;
+	float rollToTake = stabilisationLateralGains.pGain * guidoVelocityHor;
+	rollToTake *= -1;
+
+	if (counterStab % 6 == 0) {
+		boundAngle(&rollToTake,max_roll_stab);
+		ref_roll=rollToTake;
+		boundAngle(&pitchToTake,0.1);
+		ref_pitch=pitchToTake;
+
+		previousStabRoll = ref_roll;
+		previousStabPitch = ref_pitch;
+		someGainWhenDoingNothing += 0.1 * ref_roll;
+		somePitchGainWhenDoingNothing += 0.1 * ref_pitch;
+	} else {
+		ref_pitch = 0.5 * previousStabPitch;
+		ref_roll = 0.5 * previousStabRoll;
+	}
+	if (abs(closest - ref_disparity_to_keep) < 5) {
+		stabPositionCount++;
+	}
+	else {
+		stabPositionCount = 0;
+	}
+
+	if (demo_type != HORIZONTAL_STABLE) {
+		if (guidoVelocityHor < 0.25 && guidoVelocityHor > -0.25) {
+			if (stabPositionCount > 20) {
+				current_state = TURN;
+				stabPositionCount = 0;
+			}
+		}
+	}
+}
+
 void stereocam_forward_velocity_periodic()
 {
 
@@ -239,108 +285,40 @@ void stereocam_forward_velocity_periodic()
 		if(closest < DANGEROUS_CLOSE_DISPARITY && detectedWall&& closest>0){
 			totalTurningSeenNothing=0;
 			current_state=STABILISE;
-			totalStabiliseStateCount=0;
 			detectedWall=0;
+			stabPositionCount=0;
 		}
 
 
     }
     else if(current_state==STABILISE){
-    	totalStabiliseStateCount++;
-    	float stab_pitch_pgain=0.1;
-    	float pitchDiff = closest- ref_disparity_to_keep;
-    	float pitchToTake = stab_pitch_pgain*pitchDiff;
+//    	somethingsomething( closest,  guidoVelocityHor);
 
-    	ref_pitch=0.0;
-		float max_roll=0.25;
-		float rollToTake =stabilisationLateralGains.pGain * guidoVelocityHor;
-		rollToTake*=-1;
-
-		if(counterStab%6==0){
-			if(rollToTake>max_roll){
-				ref_roll=max_roll;
-			}
-			else if(rollToTake<(-1.0*max_roll)){
-				ref_roll=-(1.0*max_roll);
-			}
-			else{
-				ref_roll=rollToTake;
-			}
-
-			if(pitchToTake>0.1){
-				ref_pitch=0.1;
-			}
-			else if (pitchToTake<-0.1){
-				ref_pitch=-0.1;
-			}
-			else{
-				ref_pitch=pitchToTake;
-			}
-
-			previousStabRoll=ref_roll;
-			someGainWhenDoingNothing+=0.1*ref_roll;
-			somePitchGainWhenDoingNothing+=0.1*ref_pitch;
-			previousStabPitch=ref_pitch;
-
-
-
-		}
-		else{
-			ref_pitch=0.5*previousStabPitch;
-			ref_roll=0.5*previousStabRoll;
-		}
-
-		if(abs(closest- ref_disparity_to_keep)<5){
-			stabPositionCount++;
-		}
-		else{
-			stabPositionCount=0;
-		}
-
-		if(demo_type!=HORIZONTAL_STABLE){
-			if(guidoVelocityHor<0.25 && guidoVelocityHor>-0.25 && totalStabiliseStateCount>10){
-				if(stabPositionCount>20){
-					current_state=TURN;
-					indexTurnFactors=0;
-					stabPositionCount=0;
-				}
-			}
-		}
      }
     else if(current_state==TURN){
     	ref_pitch=0.0;
     	ref_roll=0.0;
 
     	headingStereocamStab += 5.0;
-    	  if (headingStereocamStab > 360.0)
-    		  headingStereocamStab -= 360.0;
-    	indexTurnFactors+=1;
-    	if(indexTurnFactors>countFactorsTurning){
-    		indexTurnFactors = countFactorsTurning;
-    	}
-    	if(indexTurnFactors > 3){
-    		if(avoidStrategy==USE_CLOSEST_DISPARITY){
-    			if(closest<CLOSE_DISPARITY && closest>0){
-					totalTurningSeenNothing++;
-					if(totalTurningSeenNothing>2){
-						current_state=GO_FORWARD;
-						detectedWall=0;
-					}
-    			}
-    		}
-    		else{
-    			if(disparitiesInDroplet<LOW_AMOUNT_PIXELS_IN_DROPLET){
-    				totalTurningSeenNothing++;
-//					if(totalTurningSeenNothing>2){
-						current_state=GO_FORWARD;
-						detectedWall=0;
-//					}
-    			}
-    		}
-    	}
-    	else{
-    		totalTurningSeenNothing=0;
-    	}
+	  if (headingStereocamStab > 360.0)
+		  headingStereocamStab -= 360.0;
+
+		if(avoidStrategy==USE_CLOSEST_DISPARITY){
+			if(closest<CLOSE_DISPARITY && closest>0){
+				totalTurningSeenNothing++;
+				if(totalTurningSeenNothing>2){
+					current_state=GO_FORWARD;
+					detectedWall=0;
+				}
+			}
+		}
+		else{
+			if(disparitiesInDroplet<LOW_AMOUNT_PIXELS_IN_DROPLET){
+				totalTurningSeenNothing++;
+				current_state=GO_FORWARD;
+				detectedWall=0;
+			}
+		}
 
     }
     else{
