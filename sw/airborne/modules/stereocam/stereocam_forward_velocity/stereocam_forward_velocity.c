@@ -62,7 +62,10 @@ float sumVelocities=0.0;
 float sumHorizontalVelocities=0.0;
 
 typedef enum{GO_FORWARD,STABILISE,TURN,INIT_FORWARD} avoidance_phase;
-avoidance_phase current_state=GO_FORWARD;
+avoidance_phase current_state=STABILISE;
+
+typedef enum{EXPLORE_ROOM,HORIZONTAL_STABLE} demonstration_type;
+demonstration_type demo_type = HORIZONTAL_STABLE;
 int totalStabiliseStateCount = 0;
 int totalTurningSeenNothing=0;
 float previousLateralSpeed = 0.0;
@@ -177,14 +180,19 @@ void stereocam_forward_velocity_periodic()
     // Set the velocity to either the average of the last few velocities, or take the current velocity with alpha times the previous one
     guidoVelocityHor = guidoVelocityHorStereoboard*velocityAverageAlpha + (1-velocityAverageAlpha)*previousHorizontalVelocity;
     sumHorizontalVelocities+=guidoVelocityHor;
-    previousHorizontalVelocity= guidoVelocityHorStereoboard;
+    previousHorizontalVelocity= guidoVelocityHor;
     //float guidoVelocityZ = upDownVelocity/100.0;
 	ref_pitch=0.0;
     ref_roll=0.0;
     if(autopilot_mode != AP_MODE_NAV){
     	 ref_alt= -state.ned_pos_f.z;
     	 ref_disparity_to_keep=CLOSE_DISPARITY-5;
-    	 current_state=TURN;
+    	 if(demo_type==HORIZONTAL_STABLE){
+    		 current_state=STABILISE;
+    	 }
+    	 else{
+    		 current_state=TURN;
+    	 }
     	 headingStereocamStab=ANGLE_FLOAT_OF_BFP(INT32_DEG_OF_RAD(stab_att_sp_euler.psi));
     	 roll_compensation=ANGLE_FLOAT_OF_BFP(stab_att_sp_euler.phi);
     	 pitch_compensation=ANGLE_FLOAT_OF_BFP(stab_att_sp_euler.theta);
@@ -227,12 +235,14 @@ void stereocam_forward_velocity_periodic()
 				ref_roll=rollToTake;
 			}
 		}
+
 		if(closest < DANGEROUS_CLOSE_DISPARITY && detectedWall&& closest>0){
 			totalTurningSeenNothing=0;
 			current_state=STABILISE;
 			totalStabiliseStateCount=0;
 			detectedWall=0;
 		}
+
 
     }
     else if(current_state==STABILISE){
@@ -246,7 +256,7 @@ void stereocam_forward_velocity_periodic()
 		float rollToTake =stabilisationLateralGains.pGain * guidoVelocityHor;
 		rollToTake*=-1;
 
-		if(counterStab%4==0){
+		if(counterStab%6==0){
 			if(rollToTake>max_roll){
 				ref_roll=max_roll;
 			}
@@ -286,15 +296,17 @@ void stereocam_forward_velocity_periodic()
 		else{
 			stabPositionCount=0;
 		}
-		if(guidoVelocityHor<0.25 && guidoVelocityHor>-0.25 && totalStabiliseStateCount>10){
 
-			if(stabPositionCount>20){
-				current_state=TURN;
-				indexTurnFactors=0;
-				stabPositionCount=0;
+		if(demo_type!=HORIZONTAL_STABLE){
+			if(guidoVelocityHor<0.25 && guidoVelocityHor>-0.25 && totalStabiliseStateCount>10){
+				if(stabPositionCount>20){
+					current_state=TURN;
+					indexTurnFactors=0;
+					stabPositionCount=0;
+				}
 			}
 		}
-       }
+     }
     else if(current_state==TURN){
     	ref_pitch=0.0;
     	ref_roll=0.0;
