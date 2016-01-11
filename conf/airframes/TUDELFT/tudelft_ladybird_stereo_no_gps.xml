@@ -71,8 +71,8 @@
 
   <section name="IMU" prefix="IMU_">
 
-    <define name="ACCEL_X_NEUTRAL" value="31"/>
-    <define name="ACCEL_Y_NEUTRAL" value="-31"/>
+    <define name="ACCEL_X_NEUTRAL" value="50"/>
+    <define name="ACCEL_Y_NEUTRAL" value="20"/>
     <define name="ACCEL_Z_NEUTRAL" value="0"/>
 
 

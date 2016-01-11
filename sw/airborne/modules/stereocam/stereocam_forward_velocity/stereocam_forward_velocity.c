@@ -61,9 +61,8 @@ float sumHorizontalVelocities=0.0;
 
 typedef enum{GO_FORWARD,STABILISE,TURN,INIT_FORWARD} avoidance_phase;
 avoidance_phase current_state=STABILISE;
-
-typedef enum{EXPLORE_ROOM,HORIZONTAL_STABLE} demonstration_type;
 demonstration_type demo_type = HORIZONTAL_STABLE;
+//int demo_type;
 int totalStabiliseStateCount = 0;
 int totalTurningSeenNothing=0;
 float previousLateralSpeed = 0.0;
