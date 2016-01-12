@@ -7,7 +7,8 @@
   <settings>
     <dl_settings name="stereocam_avoidance">
       <dl_settings name="mode">
-        <dl_setting max="1" min="0" step="1" var="demo_type" shortname="mode" values="EXPLORE|STABLE"/>
+        <dl_setting max="2" min="0" step="1" var="demo_type" shortname="mode" values="EXPLORE|STABLE|DROPLET"/>
+        <dl_setting max="360" min="0" step="1" var="headingStereocamStab" shortname="heading" />
       </dl_settings>
     </dl_settings>
   </settings>

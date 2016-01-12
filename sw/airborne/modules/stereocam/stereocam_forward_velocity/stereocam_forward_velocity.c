@@ -59,10 +59,9 @@ float sumVelocities=0.0;
 
 float sumHorizontalVelocities=0.0;
 
-typedef enum{GO_FORWARD,STABILISE,TURN,INIT_FORWARD} avoidance_phase;
 avoidance_phase current_state=STABILISE;
 demonstration_type demo_type = HORIZONTAL_STABLE;
-//int demo_type;
+
 int totalStabiliseStateCount = 0;
 int totalTurningSeenNothing=0;
 float previousLateralSpeed = 0.0;
@@ -70,7 +69,7 @@ uint8_t detectedWall=0;
 float velocityAverageAlpha = 0.65;
 float previousHorizontalVelocity = 0.0;
 
-float ref_disparity_to_keep=40.0;
+float ref_disparity_to_keep=25.0;
 float pitch_compensation = 0.0;
 float roll_compensation=0.0;
 int initFastForwardCount = 0;
@@ -87,13 +86,18 @@ float somePitchGainWhenDoingNothing=0.0;
 float previousStabPitch=0.0;
 int stabPositionCount=0;
 float max_roll_forward=0.25;
+float disparityDiffSum=0.0;
+int timeInStabMode=0;
+uint8_t initialisedTurnPhase=0;
+int turnDirection=1;
 void stereocam_forward_velocity_init()
 {
 	stabilisationLateralGains.pGain=0.5;
 	stabilisationLateralGains.dGain=0.05;
 	stabilisationLateralGains.iGain=0.01;
 	forwardLateralGains.pGain=0.6;
-	stabilisationForwardGains.pGain=0.1;
+	stabilisationForwardGains.pGain=0.3;
+	stabilisationForwardGains.iGain=0.001;
 }
 
 void array_pop(float *array, int lengthArray);
@@ -200,13 +204,29 @@ void forwardFunction(uint8_t closest, float dist, int disparitiesInDroplet,float
 	}
 }
 
-void turnFunction(uint8_t closest, int disparitiesInDroplet);
-void turnFunction(uint8_t closest, int disparitiesInDroplet) {
+void turnFunction(uint8_t closest, int disparitiesInDroplet, uint8_t disparityLeft, uint8_t disparityRight);
+void turnFunction(uint8_t closest, int disparitiesInDroplet, uint8_t disparityLeft, uint8_t disparityRight) {
 	ref_pitch=0.0;
 	ref_roll=0.0;
+	if(!initialisedTurnPhase){
+		if(disparityLeft>disparityRight){
+			turnDirection =1;
+		}
+		else{
+			turnDirection=-1;
+		}
+		initialisedTurnPhase=1;
+		headingStereocamStab += turnDirection*35.0;
+	}
+	if(demo_type==DROPLET){
+		headingStereocamStab += 180.0;
+		current_state=INIT_FORWARD;
+	}
+	else{
+		headingStereocamStab += turnDirection*5.0;
 
-	headingStereocamStab += 5.0;
-  if (headingStereocamStab > 360.0){
+	}
+	if (headingStereocamStab > 360.0){
 	  headingStereocamStab -= 360.0;
   }
 
@@ -228,8 +248,12 @@ void turnFunction(uint8_t closest, int disparitiesInDroplet) {
 	}
 }
 
+uint8_t isFartherThanGoal(uint8_t closest,float ref_disparity_to_keep){
+	return closest > 0 && closest < ref_disparity_to_keep;
+}
 void stabilisationFunction(uint8_t closest, float guidoVelocityHor);
 void stabilisationFunction(uint8_t closest, float guidoVelocityHor) {
+	timeInStabMode++;
 	float pitchDiff = closest - ref_disparity_to_keep;
 	float pitchToTake = stabilisationForwardGains.pGain * pitchDiff;
 	float rollToTake = stabilisationLateralGains.pGain * guidoVelocityHor;
@@ -246,7 +270,7 @@ void stabilisationFunction(uint8_t closest, float guidoVelocityHor) {
 		someGainWhenDoingNothing += 0.1 * ref_roll;
 		somePitchGainWhenDoingNothing += 0.1 * ref_pitch;
 	} else {
-		ref_pitch = 0.4 * previousStabPitch;
+		ref_pitch = 0.8 * previousStabPitch;
 		ref_roll = 0.4 * previousStabRoll;
 	}
 	if (abs(closest - ref_disparity_to_keep) < 5) {
@@ -256,11 +280,27 @@ void stabilisationFunction(uint8_t closest, float guidoVelocityHor) {
 		stabPositionCount = 0;
 	}
 
+	if (demo_type == DROPLET){
+		if(timeInStabMode>5){
+			disparityDiffSum=0.0;
+			current_state = TURN;
+			stabPositionCount = 0;
+			timeInStabMode=0;
+		}
+	}
+	// Maybe we can start turning
 	if (demo_type != HORIZONTAL_STABLE) {
-		if (guidoVelocityHor < 0.25 && guidoVelocityHor > -0.25) {
-			if (stabPositionCount > 20) {
-				current_state = TURN;
+
+		// Maybe we can go to turn phase
+		if ((guidoVelocityHor < 0.25 && guidoVelocityHor > -0.25)||isFartherThanGoal( closest, ref_disparity_to_keep)){
+			if (stabPositionCount > 10 || isFartherThanGoal( closest, ref_disparity_to_keep) || timeInStabMode>50) {
+				disparityDiffSum=0.0;
 				stabPositionCount = 0;
+				timeInStabMode=0;
+				// Set new mode
+				current_state = TURN;
+				initialisedTurnPhase=0;
+
 			}
 		}
 	}
@@ -276,6 +316,8 @@ void stereocam_forward_velocity_periodic()
 	uint8_t disparitiesInDroplet = stereocam_data.data[5];
     int horizontalVelocity = stereocam_data.data[8]-127;
     int upDownVelocity = stereocam_data.data[9] -127;
+    uint8_t disparityLeft = stereocam_data.data[10] ;
+    uint8_t disparityRight = stereocam_data.data[11];
 
     float  BASELINE_STEREO_MM = 60.0;
     float BRANDSPUNTSAFSTAND_STEREO = 118.0 * 6.0 * 2.0;
@@ -297,7 +339,9 @@ void stereocam_forward_velocity_periodic()
     ref_roll=0.0;
     if(autopilot_mode != AP_MODE_NAV){
     	 ref_alt= -state.ned_pos_f.z;
-    	 ref_disparity_to_keep=CLOSE_DISPARITY-5;
+    	 ref_disparity_to_keep=20.0;
+    	 disparityDiffSum=0.0;
+    	 initialisedTurnPhase=0;
     	 if(demo_type==HORIZONTAL_STABLE){
     		 current_state=STABILISE;
     	 }
@@ -317,7 +361,17 @@ void stereocam_forward_velocity_periodic()
 
      }
     else if(current_state==TURN){
-    	turnFunction( closest, disparitiesInDroplet);
+    	turnFunction( closest, disparitiesInDroplet,disparityLeft,disparityRight);
+    }
+    else if(current_state==INIT_FORWARD){
+
+    	ref_pitch=0.0;
+        ref_roll=0.0;
+    	// wait till turn completed
+    	float currentHeading=ANGLE_FLOAT_OF_BFP(INT32_DEG_OF_RAD(stab_att_sp_euler.psi));
+    	if(fabs(currentHeading-headingStereocamStab)<10){
+    		current_state=GO_FORWARD;
+    	}
     }
     else{
     	current_state=GO_FORWARD;
@@ -328,7 +382,7 @@ void stereocam_forward_velocity_periodic()
     ref_pitch += pitch_compensation;
     ref_roll += roll_compensation;
     boundAngle(&ref_roll,0.2); boundAngle(&ref_pitch,0.2);
-    DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &disparitiesInDroplet,&dist, &velocityFound,&guidoVelocityHor,&ref_disparity_to_keep,&current_state,&guidance_h_trim_att_integrator.x);
+    DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &disparitiesInDroplet,&dist, &velocityFound,&guidoVelocityHor,&ref_disparity_to_keep,&current_state,&timeInStabMode,&disparityLeft,&disparityRight);
     DOWNLINK_SEND_REFROLLPITCH(DefaultChannel, DefaultDevice, &ref_roll,&ref_pitch);
   }
 }

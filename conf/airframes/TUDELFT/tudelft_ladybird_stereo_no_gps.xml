@@ -75,8 +75,6 @@
     <define name="ACCEL_Y_NEUTRAL" value="20"/>
     <define name="ACCEL_Z_NEUTRAL" value="0"/>
 
-
-
     <define name="BODY_TO_IMU_PHI" value="-1.4" unit="deg"/>
     <define name="BODY_TO_IMU_THETA" value="0.66" unit="deg"/>
     <define name="BODY_TO_IMU_PSI" value="-13." unit="deg"/>
@@ -120,7 +118,7 @@
     <define name="SP_MAX_PHI" value="45." unit="deg"/>
     <define name="SP_MAX_THETA" value="45." unit="deg"/>
     <define name="SP_MAX_PSI" value="45." unit="deg"/>
-    <define name="SP_MAX_R" value="180." unit="deg/s"/>
+    <define name="SP_MAX_R" value="70." unit="deg/s"/>
     <define name="SP_MAX_P" value="90." unit="deg/s"/>
     <define name="DEADBAND_R" value="250"/>
     <define name="DEADBAND_A" value="250"/>
@@ -188,15 +186,7 @@
     <define name="H_X" value="0.39049610"/>
     <define name="H_Y" value="0.00278894"/>
     <define name="H_Z" value="0.92060036"/>
-    <define name="USE_GPS_HEADING" value="0"/>
-
-    <define name="USE_MAGNETOMETER" value="1"/>
   </section>
-<define name="USE_GPS" value="FALSE"/>
- <define name="NO_GPS_NEEDED_FOR_NAV" value="TRUE"/>
- <define name="USE_GPS_HEADING" value="FALSE"/>
- <define name="USE_MAGNETOMETER" value="TRUE"/>
-<define name="GUIDANCE_INDI" value="0"/>
 
  <section name="GUIDANCE_H" prefix="GUIDANCE_H_">
    <define name="PGAIN" value="200"/>
