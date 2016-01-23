@@ -20,14 +20,22 @@
 #include "subsystems/datalink/telemetry.h"
 #include "firmwares/rotorcraft/stabilization/stabilization_attitude_quat_int.h"
 #include "subsystems/radio_control.h"
+#include "math/pprz_algebra_int.h"
 
+
+// for example use the standard horizontal (hover) mode // GUIDANCE_H_MODE_ATTITUDE // GUIDANCE_H_MODE_HOVER
+#define GUIDANCE_H_MODE_MODULE_SETTING GUIDANCE_H_MODE_MODULE
+
+
+// and own guidance_v
+#define GUIDANCE_V_MODE_MODULE_SETTING GUIDANCE_V_MODE_MODULE
 
 #define AVERAGE_VELOCITY 0
 // Know waypoint numbers and blocks
 #include "generated/flight_plan.h"
 float ref_pitch=0.0;
 float ref_roll=0.0;
-
+#include "firmwares/rotorcraft/stabilization.h"
 
  struct Gains{
 	 float pGain;
@@ -62,6 +70,7 @@ float previousLateralSpeed = 0.0;
 uint8_t detectedWall=0;
 float velocityAverageAlpha = 0.65;
 float previousHorizontalVelocity = 0.0;
+float previousVerticalVelocity = 0.0;
 //#define DANGEROUS_CLOSE_DISPARITY 24
 int DANGEROUS_CLOSE_DISPARITY=30;
 //#define CLOSE_DISPARITY 18
@@ -105,6 +114,8 @@ uint8_t dangerousClose(uint8_t closeValue){
 uint8_t simplyClose(uint8_t closeValue){
 	return closeValue>CLOSE_DISPARITY || closeValue==0;
 }
+int32_t previousThrust = 0;
+
 void stereocam_forward_velocity_periodic()
 {
 
@@ -135,8 +146,10 @@ void stereocam_forward_velocity_periodic()
     previousHorizontalVelocity= guidoVelocityHorStereoboard;
 
     int timeStamp = 0;
-    //float guidoVelocityZ = upDownVelocity/100.0;
-    float guidoVelocityZ=0.0;
+    float guidoVelocityZSB = upDownVelocity/100.0;
+    float guidoVelocityZ = guidoVelocityZSB * velocityAverageAlpha + (1-velocityAverageAlpha)*previousVerticalVelocity;
+    previousVerticalVelocity = guidoVelocityZSB;
+    //    float guidoVelocityZ=0.0;
     float noiseUs = 0.3f;
 /*
     AbiSendMsgVELOCITY_ESTIMATE(STEREO_VELOCITY_ID, timeStamp, velocityFound, guidoVelocityHor,
@@ -144,12 +157,14 @@ void stereocam_forward_velocity_periodic()
                                 noiseUs);*/
 	ref_pitch=0.0;
     ref_roll=0.0;
-    if(autopilot_mode != AP_MODE_NAV){
+    ref_alt += guidoVelocityZ*0.15;
+    if((autopilot_mode != AP_MODE_NAV) && (autopilot_mode != AP_MODE_MODULE)){
     	 ref_alt= -state.ned_pos_f.z;
     	 current_state=STABILISE;
     	 headingStereocamStab=ANGLE_FLOAT_OF_BFP(INT32_DEG_OF_RAD(stab_att_sp_euler.psi));
     	 roll_compensation=ANGLE_FLOAT_OF_BFP(stab_att_sp_euler.phi);
     	 pitch_compensation=ANGLE_FLOAT_OF_BFP(stab_att_sp_euler.theta);
+    	 previousThrust=stabilization_cmd[COMMAND_THRUST];
     	 totalStabiliseStateCount=0;
     }
     if(demonstration_type==HORIZONTAL_HOVER){
@@ -205,7 +220,9 @@ void stereocam_forward_velocity_periodic()
     }
     else if(current_state==STABILISE){
     	totalStabiliseStateCount++;
-    	float stab_pitch_pgain=0.04;
+    //	float stab_pitch_pgain=0.04;
+
+    	float stab_pitch_pgain=0.08;
     	float pitchDiff = closest- ref_disparity_to_keep;
     	float pitchToTake = stab_pitch_pgain*pitchDiff;
     	if(dangerousClose(closest)){
@@ -213,10 +230,12 @@ void stereocam_forward_velocity_periodic()
     	}
     	ref_pitch=0.0;
 		float max_roll=0.25;
+		float max_pitch_to_take=0.25;
 		float rollToTake =stabilisationLateralGains.pGain * guidoVelocityHor;
 		rollToTake*=-1;
 
 		if(counterStab%4==0){
+		    previousThrust+=guidoVelocityZ*0.01*MAX_PPRZ;
 			if(rollToTake>max_roll){
 				ref_roll=max_roll;
 			}
@@ -227,11 +246,11 @@ void stereocam_forward_velocity_periodic()
 				ref_roll=rollToTake;
 			}
 
-			if(pitchToTake>0.15){
-				ref_pitch=0.15;
+			if(pitchToTake>max_pitch_to_take){
+				ref_pitch=max_pitch_to_take;
 			}
-			else if (pitchToTake<-0.15){
-				ref_pitch=-0.15;
+			else if (pitchToTake<-1*max_pitch_to_take){
+				ref_pitch=-1*max_pitch_to_take;
 			}
 			else{
 				ref_pitch=pitchToTake;
@@ -311,12 +330,12 @@ void stereocam_forward_velocity_periodic()
 
     ref_pitch += pitch_compensation;
     ref_roll += roll_compensation;
-
-    if(ref_pitch>0.15){
-		ref_pitch=0.15;
+    float maxRefPitch = 0.25;
+    if(ref_pitch>maxRefPitch){
+		ref_pitch=maxRefPitch;
 	}
-	else if (ref_pitch<-0.15){
-		ref_pitch=-0.15;
+	else if (ref_pitch<-1*maxRefPitch){
+		ref_pitch=-1*maxRefPitch;
 	}
 
 
@@ -344,8 +363,84 @@ void stereocam_forward_velocity_periodic()
    		addedPitchJoystick=-0.25;
    	}
     ref_pitch+= addedPitchJoystick;
-    DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &disparitiesInDroplet,&dist, &guidoVelocityHor,&guidoVelocityHor,&ref_disparity_to_keep,&current_state,&totalStabiliseStateCount,&disparityLeft,&disparityRight,&stabilisationLateralGains.pGain);
+    DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &disparitiesInDroplet,&dist, &guidoVelocityHor,&guidoVelocityHor,&guidoVelocityZ,&current_state,&totalStabiliseStateCount,&disparityLeft,&disparityRight,&stabilisationLateralGains.pGain);
     DOWNLINK_SEND_REFROLLPITCH(DefaultChannel, DefaultDevice, &ref_roll,&ref_pitch);
 //*/
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Initialization of horizontal guidance module.
+ */
+void guidance_h_module_init(void)
+{
+
+}
+
+/**
+ * Horizontal guidance mode enter resets the errors
+ * and starts the controller.
+ */
+void guidance_h_module_enter(void)
+{
+
+}
+
+/**
+ * Read the RC commands
+ */
+void guidance_h_module_read_rc(void)
+{
+  // TODO: change the desired vx/vy
+}
+
+/**
+ * Main guidance loop
+ * @param[in] in_flight Whether we are in flight or not
+ */
+void guidance_h_module_run(bool_t in_flight)
+{
+	struct Int32Eulers command;
+//	command.phi=ANGLE_BFP_OF_REAL(ref_roll);
+//	command.theta=ANGLE_BFP_OF_REAL(ref_pitch);
+	command.phi=ANGLE_BFP_OF_REAL(0);
+	command.theta=ANGLE_BFP_OF_REAL(0);
+	command.psi=ANGLE_BFP_OF_REAL(headingStereocamStab);
+  /* Update the setpoint */
+  stabilization_attitude_set_rpy_setpoint_i(&command);
+
+  /* Run the default attitude stabilization */
+  stabilization_attitude_run(in_flight);
+}
+
+
+
+// Implement own Horizontal loops
+ void guidance_v_module_init(void){
+
+ }
+ void guidance_v_module_enter(void){
+
+ }
+ void guidance_v_module_read_rc(void){
+
+ }
+void guidance_v_module_run(bool_t in_flight){
+	int32_t thrust = 0.80 * MAX_PPRZ;
+	stabilization_cmd[COMMAND_THRUST] = previousThrust;
+}
+

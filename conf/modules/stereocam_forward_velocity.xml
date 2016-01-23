@@ -19,6 +19,10 @@
   <periodic fun="stereocam_forward_velocity_periodic()" freq="512"/>
   <makefile>
     <file name="stereocam_forward_velocity/stereocam_forward_velocity.c"  />
+    <raw>
+      ap.CFLAGS += -DGUIDANCE_V_MODE_MODULE_SETTING=GUIDANCE_V_MODE_MODULE
+      ap.CFLAGS += -DGUIDANCE_H_MODE_MODULE_SETTING=GUIDANCE_H_MODE_MODULE
+   </raw> 
   </makefile>
 </module>
 
