@@ -1,0 +1,16 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="orange_avoider">
+  <doc>
+    <description>Example on how to use the colours detected to avoid orange pole in the cyberzoo</description>
+  </doc>
+  <header>
+    <file name="orange_avoider.h"/>
+  </header>
+  <init fun="orange_avoider_init()"/>
+  <periodic fun="orange_avoider_periodic()" freq="4"/>
+  <makefile>
+    <file name="orange_avoider.c"/>
+  </makefile>
+</module>
+
