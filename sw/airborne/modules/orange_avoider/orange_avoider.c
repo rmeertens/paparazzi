@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) Roland Meertens
+ *
+ * This file is part of paparazzi
+ *
+ */
+/**
+ * @file "modules/orange_avoider/orange_avoider.c"
+ * @author Roland Meertens
+ * Example on how to use the colours detected to avoid orange pole in the cyberzoo
+ */
+
+#include "modules/orange_avoider/orange_avoider.h"
+#include "modules/computer_vision/colorfilter.h"
+#include "firmwares/rotorcraft/navigation.h"
+#include "state.h"
+
+uint8_t safeToGoForwards=FALSE;
+int tresholdColorCount = 1000;
+
+void orange_avoider_init() {
+	// Initialise the variables of the colorfilter to accept orange
+	color_lum_min=4;
+	color_lum_max=91;
+	color_cb_min=0;
+	color_cb_max=124;
+	color_cr_min=127;
+	color_cr_max=255;
+}
+void orange_avoider_periodic() {
+	// Check the amount of orange. If this is above a threshold
+	// you want to turn a certain amount of degrees
+	safeToGoForwards = color_count < tresholdColorCount;
+}
+
+
+uint8_t increase_nav_heading(int32_t *heading, int32_t increment)
+{
+  *heading = *heading + increment;
+
+  // Check if your turn made it go out of bounds...
+  while(*heading > 360){
+	  *heading-=360;
+  }
+  while(*heading < 0){
+	  *heading+=360;
+  }
+
+  return TRUE;
+}
+uint8_t moveWaypointForwards(uint8_t waypoint){
+	  struct EnuCoor_i new_coor;
+	  struct EnuCoor_i *pos = stateGetPositionEnu_i(); // Get your current position
+
+	  // Calculate the sine and cosine of the heading the drone is keeping
+	  float sin_heading = sinf(ANGLE_FLOAT_OF_BFP(nav_heading));
+	  float cos_heading = cosf(ANGLE_FLOAT_OF_BFP(nav_heading));
+
+	  // Now determine where to place the waypoint you want to go to
+	  float NAV_LINE_AVOID_SEGMENT_LENGTH = 1.50; // Meters
+	  new_coor.x = pos->x + POS_BFP_OF_REAL(sin_heading * (NAV_LINE_AVOID_SEGMENT_LENGTH));
+	  new_coor.y = pos->y + POS_BFP_OF_REAL(cos_heading * (NAV_LINE_AVOID_SEGMENT_LENGTH));
+	  new_coor.z = pos->z; // Keep the height the same
+
+	  // Set the waypoint to the calculated position
+	  waypoint_set_xy_i(waypoint, new_coor.x, new_coor.y);
+
+	  return TRUE;
+}
+
+
