@@ -36,6 +36,7 @@
 #include "modules/stereocam/stereocam.h"
 #include "modules/obstacle_avoidance/guidance_OA.h"
 #include "modules/obstacle_avoidance/obstacle_avoidance.h"
+#include "subsystems/radio_control.h"
 
 #ifndef AVOIDANCES_DISTANCES_HOR_COUNT
 #define AVOIDANCES_DISTANCES_HOR_COUNT 36
@@ -63,7 +64,7 @@ float ref_yaw = 0.0;
 //tuning info
 float reference_pitch = 0.1;
 float reference_roll = 0.1;
-float dist_treshold = 1.25;
+float dist_treshold = 1.75;
 float distances_hor[AVOIDANCES_DISTANCES_HOR_COUNT];
 
 //////////////Variables CN///////////////////
@@ -395,10 +396,11 @@ void pingpong_euler(float *distances_hor_local, float *horizontalAnglesMeasureme
     ref_roll = sumRoll;
   }
 
-
+  float addedPitchJoystick = ((float)radio_control.values[RADIO_PITCH])/((float)MAX_PPRZ);//RADIO_CONTROL_NB_CHANNEL
+  ref_pitch += addedPitchJoystick/4;
+  float addedRollJoystick = ((float)radio_control.values[RADIO_ROLL])/((float)MAX_PPRZ);//RADIO_CONTROL_NB_CHANNEL
+  ref_roll += addedRollJoystick/4;
   printf("DegOfRad data %f %f\n", ref_pitch, ref_roll);
-
-
 }
 
 void CN_potential_heading(void)

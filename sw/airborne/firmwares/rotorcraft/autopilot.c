@@ -38,6 +38,7 @@
 #include "subsystems/datalink/telemetry.h"
 #include "firmwares/rotorcraft/navigation.h"
 #include "firmwares/rotorcraft/guidance.h"
+#include "mcu_periph/sys_time.h"
 
 #include "firmwares/rotorcraft/stabilization.h"
 #include "firmwares/rotorcraft/stabilization/stabilization_none.h"

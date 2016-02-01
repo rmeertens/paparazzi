@@ -5,11 +5,12 @@
   <firmware name="rotorcraft">
     <target name="ap" board="ardrone2">
       <configure name="USE_BARO_BOARD" value="TRUE"/>
+      <define name="USE_SONAR" value="TRUE"/>
+      <define name="NO_GPS_NEEDED_FOR_NAV" value="TRUE"/>
     </target>
 
     <define name="FAILSAFE_DESCENT_SPEED" value="0.5"/>
-    <define name="USE_SONAR" value="TRUE"/>
-    <define name="NO_GPS_NEEDED_FOR_NAV" value="TRUE"/>
+    
     <configure name="USE_MAGNETOMETER" value="TRUE"/>
 
 	<!-- Subsystem section -->
@@ -19,7 +20,7 @@
     <subsystem name="actuators" type="ardrone2"/>
     <subsystem name="imu" type="ardrone2"/>
 
-    <subsystem name="gps" type="datalink"/>
+    <!--subsystem name="gps" type="datalink"/-->
     <subsystem name="stabilization" type="int_quat"/>
     <subsystem name="ahrs" type="int_cmpl_quat"/>
     <subsystem name="ins" type="extended"/>
@@ -29,8 +30,9 @@
     <load name="bat_voltage_ardrone2.xml"/>
     <load name="stereocam.xml">
 	<configure name="STEREO_UART" value="UART1"/>
-	<configure name="STEREO_BAUD" value="B115200"/>
+	<configure name="STEREO_BAUD" value="B1000000"/>
     </load>
+    <load name="obstacle_avoidance.xml"/>
   </modules>
 
   <commands>
@@ -205,13 +207,14 @@
   </section>
 
   <section name="AUTOPILOT">
-    <define name="MODE_STARTUP" value="AP_MODE_NAV"/>
+    <define name="MODE_STARTUP" value="AP_MODE_ATTITUDE_DIRECT"/>
     <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
     <define name="MODE_AUTO1" value="AP_MODE_HOVER_Z_HOLD"/>
-    <define name="MODE_AUTO2" value="AP_MODE_NAV"/>
+    <define name="MODE_AUTO2" value="AP_MODE_MODULE"/>
     <define name="ARRIVED_AT_WAYPOINT" value="0.15"/>
     <define name="AUTOPILOT_IN_FLIGHT_MIN_THRUST" value="1500"/>
     <define name="NO_RC_THRUST_LIMIT" value="TRUE"/>
+    <define name="NO_GPS_NEEDED_FOR_NAV" value="TRUE"/>
   </section>
 
   <section name="BAT">
