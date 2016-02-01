@@ -75,18 +75,6 @@
     <define name="ACCEL_Y_NEUTRAL" value="10"/>
     <define name="ACCEL_Z_NEUTRAL" value="0"/>
 
-<!-- San francisco hotel room --> 
-<define name="MAG_X_NEUTRAL" value="-359"/>
-<define name="MAG_Y_NEUTRAL" value="-398"/>
-<define name="MAG_Z_NEUTRAL" value="151"/>
-<define name="MAG_X_SENS" value="4.45186357794" integer="16"/>
-<define name="MAG_Y_SENS" value="5.00804811901" integer="16"/>
-<define name="MAG_Z_SENS" value="5.35228720691" integer="16"/>
-<define name= "MAG_X_CURRENT_COEF" value="0.00235091485166"/>
-<define name= "MAG_Y_CURRENT_COEF" value="0.0139475955674"/>
-<define name= "MAG_Z_CURRENT_COEF" value="0.00810822193024"/>
-
-<!--End of San francisco hotel room --> 
 
 
     <define name="BODY_TO_IMU_PHI" value="0.4" unit="deg"/>
@@ -95,10 +83,10 @@
   </section>
 
  <section name="AUTOPILOT">
-   <define name="MODE_STARTUP" value="AP_MODE_NAV"/>
+   <define name="MODE_STARTUP" value="AP_MODE_ATTITUDE_DIRECT"/>
    <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
    <define name="MODE_AUTO1" value="AP_MODE_ATTITUDE_Z_HOLD"/>
-   <define name="MODE_AUTO2" value="AP_MODE_NAV"/>
+   <define name="MODE_AUTO2" value="AP_MODE_MODULE"/>
 
     <define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="TRUE"/>
     <define name="NO_RC_THRUST_LIMIT" value="TRUE"/>
@@ -275,7 +263,7 @@
       <define name="LISA_S_UPSIDE_DOWN"/> <!-- Upside down is a relative term. :) -->
     </subsystem>
 	
-    <subsystem name="gps" type="ublox"/>
+    <!--subsystem name="gps" type="datalink"/-->
     <subsystem name="stabilization" type="int_quat"/>
     <subsystem name="ahrs" type="int_cmpl_quat"/>
     <subsystem name="ins"/>

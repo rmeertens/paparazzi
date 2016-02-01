@@ -51,7 +51,40 @@
    telemetry="telemetry/default_rotorcraft.xml"
    flight_plan="flight_plans/TUDELFT/rotorcraft_flightplan_panasonic.xml"
    settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/control/stabilization_rate.xml settings/estimation/body_to_imu.xml"
-   gui_color="blue"
    settings_modules="modules/air_data.xml modules/stereocam_forward_velocity_optitrack.xml"
+   gui_color="blue"
+  />
+  <aircraft
+   name="pocketdronesuperbitrf"
+   ac_id="5"
+   airframe="airframes/examples/ladybird_lisa_s.xml"
+   radio="radios/cockpitSX.xml"
+   telemetry="telemetry/default_rotorcraft.xml"
+   flight_plan="flight_plans/rotorcraft_optitrack.xml"
+   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/control/stabilization_rate.xml settings/estimation/body_to_imu.xml"
+   settings_modules="modules/gps_ubx_ucenter.xml"
+   gui_color="blue"
+  />
+  <aircraft
+   name="pocketgps"
+   ac_id="6"
+   airframe="airframes/TUDELFT/tudelft_ladybird_stereo_no_gps.xml"
+   radio="radios/cockpitSX.xml"
+   telemetry="telemetry/default_rotorcraft.xml"
+   flight_plan="flight_plans/TUDELFT/rotorcraft_selfie.xml"
+   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/control/stabilization_rate.xml settings/estimation/body_to_imu.xml"
+   settings_modules="modules/air_data.xml modules/stereocam_forward_velocity.xml"
+   gui_color="blue"
+  />
+  <aircraft
+   name="selfiedrone"
+   ac_id="7"
+   airframe="airframes/TUDELFT/tudelft_ladybird_selfie.xml"
+   radio="radios/cockpitSX.xml"
+   telemetry="telemetry/default_rotorcraft.xml"
+   flight_plan="flight_plans/TUDELFT/rotorcraft_flightplan_panasonic.xml"
+   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/control/stabilization_rate.xml settings/estimation/body_to_imu.xml"
+   settings_modules="modules/air_data.xml modules/stereocam_forward_velocity_optitrack.xml"
+   gui_color="blue"
   />
 </conf>
