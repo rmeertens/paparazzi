@@ -220,9 +220,9 @@ void stereocam_forward_velocity_periodic()
     }
     else if(current_state==STABILISE){
     	totalStabiliseStateCount++;
-    //	float stab_pitch_pgain=0.04;
+    	float stab_pitch_pgain=0.04;
 
-    	float stab_pitch_pgain=0.08;
+//    	float stab_pitch_pgain=0.08;
     	float pitchDiff = closest- ref_disparity_to_keep;
     	float pitchToTake = stab_pitch_pgain*pitchDiff;
     	if(dangerousClose(closest)){
@@ -415,9 +415,6 @@ void guidance_h_module_read_rc(void)
 void guidance_h_module_run(bool_t in_flight)
 {
 	struct Int32Eulers command;
-//	command.phi=ANGLE_BFP_OF_REAL(ref_roll);
-//	command.theta=ANGLE_BFP_OF_REAL(ref_pitch);
-
 	 float addedRollJoystick = ((float)radio_control.values[RADIO_ROLL])/((float)MAX_PPRZ);//RADIO_CONTROL_NB_CHANNEL
 	    if(addedRollJoystick>0.25){
 	    	addedRollJoystick=0.25;
@@ -425,7 +422,6 @@ void guidance_h_module_run(bool_t in_flight)
 		else if (addedRollJoystick<-0.25){
 			addedRollJoystick=-0.25;
 		}
-	    ref_roll= addedRollJoystick;
 
 
 	    float addedPitchJoystick = ((float)radio_control.values[RADIO_PITCH])/((float)MAX_PPRZ);//RADIO_CONTROL_NB_CHANNEL
@@ -435,10 +431,9 @@ void guidance_h_module_run(bool_t in_flight)
 	   	else if (addedPitchJoystick<-0.25){
 	   		addedPitchJoystick=-0.25;
 	   	}
-	    ref_pitch= addedPitchJoystick;
 
-	command.phi=ANGLE_BFP_OF_REAL(ref_roll);
-	command.theta=ANGLE_BFP_OF_REAL(ref_pitch);
+	command.phi=ANGLE_BFP_OF_REAL(ref_roll+addedRollJoystick);
+	command.theta=ANGLE_BFP_OF_REAL(ref_pitch+addedPitchJoystick);
 	command.psi=INT32_RAD_OF_DEG(ANGLE_BFP_OF_REAL(headingStereocamStab));
 	  /* Update the setpoint */
 	  stabilization_attitude_set_rpy_setpoint_i(&command);
