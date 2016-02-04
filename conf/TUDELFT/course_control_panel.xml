@@ -77,9 +77,13 @@
         <arg flag="-speech"/>
       </program>
       <program name="Joystick" command="sw/ground_segment/joystick/input2ivy">
+        <arg flag="-d" constant="2"/>
         <arg flag="-ac" constant="@AIRCRAFT"/>
         <arg flag="hobbyking.xml"/>
       </program>
+     <program name="NatNet" command="sw/ground_segment/misc/natnet2ivy">
+      <arg flag="-ac" constant="3 2"/>
+    </program>
 
       <program name="Messages" command="sw/ground_segment/tmtc/messages"/>
     </session>

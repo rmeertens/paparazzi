@@ -26,7 +26,7 @@
 
   <exceptions>
     <!-- Check inside small flight area, then goto Center(Standby) -->
-    <exception cond="Or(! InsideFlight_Area(GetPosX(), GetPosY()), GetPosAlt() > GetAltRef() + 50)" deroute="Standby"/>
+    <exception cond="!InsideFlight_Area(GetPosX(), GetPosY())" deroute="land here"/>
     </exceptions>
   <blocks>
     <block name="Wait GPS">
