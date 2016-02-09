@@ -8,15 +8,44 @@
 	</head>
 	<body>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r71/three.js"></script>
-		<script src="js/OrbitControls.js"></script>
-<script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
-
-                <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> 
+        <script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> 
 		<script>
+            
+
+            function addFloorAndLight(){
+                  var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.5);
+                  scene.add(light);
+                  THREE.ImageUtils.crossOrigin = '';
+                  var texture = THREE.ImageUtils.loadTexture(
+                    'checker.png'
+                  );
+                  texture.wrapS = THREE.RepeatWrapping;
+                  texture.wrapT = THREE.RepeatWrapping;
+                  texture.repeat = new THREE.Vector2(50, 50);
+                  texture.anisotropy = renderer.getMaxAnisotropy();
+
+                  var material = new THREE.MeshPhongMaterial({
+                    color: 0xffffff,
+                    specular: 0xffffff,
+                    shininess: 20,
+                    shading: THREE.FlatShading,
+                    map: texture
+                  });
+
+                  var geometry = new THREE.PlaneGeometry(1000, 1000);
+
+                  var mesh = new THREE.Mesh(geometry, material);
+                  mesh.rotation.x = -Math.PI / 2;
+                  mesh.position.y = -80;
+                  scene.add(mesh);
+
+            }
+
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-			  controls = new THREE.OrbitControls( camera );
-			  controls.addEventListener( 'change', render );
+			 controls = new THREE.OrbitControls( camera );
+            controls.addEventListener( 'change', render );
 
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -26,31 +55,31 @@
 			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 			var cube = new THREE.Mesh( geometry, material );
 			scene.add( cube );
-
+            addFloorAndLight()
 			camera.position.z = 5;
 
 			var render = function () {
 				requestAnimationFrame( render );
-
 				renderer.render(scene, camera);
 			};
 			render();
 
-  $(document).ready(function(){
-  function updateTime() {
-$.getJSON( 'http://127.0.0.1:5000/message/201/INS', {none:"hello"
-      }, function(data) {
-       
-        cube.position.z=data.ins_z/100;
-
-        cube.position.y=data.ins_y/100;
-
-        cube.position.x=data.ins_x/100;
-       // $("#1").html(data);
-      });
-  }
-  setInterval(updateTime, 100); // 1000 miliseconds 
-  }); 
+//  $(document).ready(function(){
+//      
+//  function updateTime() {
+//$.getJSON( 'http://127.0.0.1:5000/message/201/INS', {none:"hello"
+//      }, function(data) {
+//       
+//        cube.position.z=data.ins_z/100;
+//
+//        cube.position.y=data.ins_y/100;
+//
+//        cube.position.x=data.ins_x/100;
+//       // $("#1").html(data);
+//      });
+//  }
+//  setInterval(updateTime, 100); // 1000 miliseconds 
+//  }); 
 		</script>
 	</body>
 </html>
