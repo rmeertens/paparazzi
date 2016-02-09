@@ -21,18 +21,19 @@
   <body>
     <div id="example"></div>
 
-  <script src="js/third-party/threejs/three.min.js"></script>
-  <script src="js/third-party/threejs/DeviceOrientationControls.js"></script>
-  <script src="js/third-party/threejs/OrbitControls.js"></script>
-  <script src="http://threejs.org/examples/js/loaders/STLLoader.js"></script>
+  <script src="./three.min.js"></script>
+  <script src="./DeviceOrientationControls.js"></script>
+  <script src="./OrbitControls.js"></script>
+  <script src="./STLLoader.js"></script>
 
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> 
   <script>
     var camera, scene, renderer;
     var controls;
     var element, container;
 
     var clock = new THREE.Clock();
-
+    var ardroneMesh;
     init();
     animate();
 
@@ -48,11 +49,18 @@
       camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
       camera.position.set(0, 10, 0);
       scene.add(camera);
-        
+
+			var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+      ardroneMesh = new THREE.Mesh( geometry, material );
+ardroneMesh.position.set(10,10,0);
+      scene.add( ardroneMesh );
+
+        /*
         
         
 				var loader = new THREE.STLLoader();
-				loader.load( './ardrone/ardrone.stl', function ( geometry ) {
+				loader.load( './ardrone.stl', function ( geometry ) {
 					var material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( 5, 5.25, 2.6 );
@@ -61,7 +69,7 @@
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
 					scene.add( mesh );
-				} );
+				} );*/
 
 
       controls = new THREE.OrbitControls(camera, element);
@@ -95,7 +103,7 @@
       scene.add(light);
 
       var texture = THREE.ImageUtils.loadTexture(
-        'textures/patterns/checker.png'
+        './checker.png'
       );
       texture.wrapS = THREE.RepeatWrapping;
       texture.wrapT = THREE.RepeatWrapping;
@@ -116,6 +124,7 @@
       mesh.rotation.x = -Math.PI / 2;
       scene.add(mesh);
 
+      
       window.addEventListener('resize', resize, false);
       setTimeout(resize, 1);
     }
@@ -162,20 +171,26 @@
       }
     }
       
-//      
-//    function updateLocation(data){
-//        var element=$('<div>message: '+data+"</div>");
-//        element.appendTo("#allMessages");
-//    }
-//
-//    function subscribeToMessage(host,frequency,aircraftID,messageName,callbackfunction){
-//
-//        setInterval(function(){$.get( host+'/message/'+aircraftID+'/'+messageName, {none:"hello"}, callbackfunction)}, frequency);
-//    }
-//
-//    $(document).ready(function(){
-//        subscribeToMessage('http://127.0.0.1:5000',100,201,"INS",updateLocation)
-//    }); 
+      
+    function updateLocation(data){
+	data = JSON.parse(data);
+ 	console.log(data);
+        ardroneMesh.position.z=data.ins_x/100;
+	var heightDrone = data["ins_z"]/100.0;
+	console.log(heightDrone);
+        ardroneMesh.position.y=-1.0*(heightDrone);
+
+        ardroneMesh.position.x=data.ins_y/100;
+    }
+
+    function subscribeToMessage(host,frequency,aircraftID,messageName,callbackfunction){
+
+        setInterval(function(){$.get( host+'/message/'+aircraftID+'/'+messageName, {none:"hello"}, callbackfunction)}, frequency);
+    }
+
+    $(document).ready(function(){
+        subscribeToMessage('http://127.0.0.1:5000',100,201,"INS",updateLocation)
+    }); 
 
 
   </script>
