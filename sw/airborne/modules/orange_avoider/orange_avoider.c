@@ -20,11 +20,11 @@ int tresholdColorCount = 1000;
 
 void orange_avoider_init() {
 	// Initialise the variables of the colorfilter to accept orange
-	color_lum_min=4;
-	color_lum_max=91;
-	color_cb_min=0;
-	color_cb_max=124;
-	color_cr_min=127;
+	color_lum_min=0;
+	color_lum_max=131;
+	color_cb_min=93;
+	color_cb_max=255;
+	color_cr_min=134;
 	color_cr_max=255;
 }
 void orange_avoider_periodic() {
