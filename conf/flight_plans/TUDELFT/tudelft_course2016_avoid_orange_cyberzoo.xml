@@ -70,21 +70,33 @@
       <go wp="GOAL"/>
      <exception cond="block_time > 1" deroute="MoveGoalForward"/>
      <exception cond="!safeToGoForwards" deroute="ChangeHeading"/>
-     <exception cond="!InsideObstacleZone(GetPosX(),GetPosY())" deroute="ChangeHeading"/>
+     <exception cond="!InsideObstacleZone(GetPosX(),GetPosY())" deroute="PrepareObstacleRun"/>
     </block>
     <block name="MoveGoalForward">
-      <call fun="moveWaypointForwards(WP_GOAL)"/>  
+      <call fun="moveWaypointForwards(WP_GOAL,3.0)"/>  
       <deroute block="StayGoal"/>
       <exception cond="!safeToGoForwards" deroute="ChangeHeading"/>
     </block>
     <block name="ChangeHeading">
       <call fun="NavSetWaypointHere(WP_STDBY)"/>
       <while cond="1">
-        <call fun="increase_nav_heading(&nav_heading, 50)"/>
- 	<call fun="moveWaypointForwards(WP_GOAL)"/>
+        <call fun="increase_nav_heading(&nav_heading, incrementForAvoidance)"/>
+ 	<call fun="moveWaypointForwards(WP_GOAL,3.0)"/>
         <go wp="STDBY"/>
       </while>
-      <exception cond="And(safeToGoForwards,InsideObstacleZone(WaypointX(WP_GOAL),WaypointY(WP_GOAL)))" deroute="StayGoal"/>
+      <exception cond="safeToGoForwards" deroute="StayGoal"/>
+    </block>
+    <block name="PrepareObstacleRun">
+        <call fun="NavSetWaypointHere(WP_STDBY)"/>
+        <call fun="nav_set_heading_towards_waypoint(WP_HOME)"/>
+	<stay wp="STDBY"/>
+        <exception cond="block_time > 1" deroute="GetOutOfObstacleZone"/>
+    </block>
+    <block name="GetOutOfObstacleZone">
+	<call fun="moveWaypointForwards(WP_GOAL,0.3)"/>
+	<call fun="chooseRandomIncrementAvoidance()"/>
+	<stay wp="GOAL"/>
+        <exception cond="block_time > 1" deroute="START"/>
     </block>
     <block key="l" name="Land here" strip_button="Land Here" strip_icon="land-right.png">
       <call fun="NavSetWaypointHere(WP_TD)"/>

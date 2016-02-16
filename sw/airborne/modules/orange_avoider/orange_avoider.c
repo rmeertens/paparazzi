@@ -14,9 +14,12 @@
 #include "modules/computer_vision/colorfilter.h"
 #include "firmwares/rotorcraft/navigation.h"
 #include "state.h"
+#include <time.h>
+#include <stdlib.h>
 
 uint8_t safeToGoForwards=FALSE;
 int tresholdColorCount = 200;
+int32_t incrementForAvoidance;
 
 void orange_avoider_init() {
 	// Initialise the variables of the colorfilter to accept orange
@@ -26,6 +29,9 @@ void orange_avoider_init() {
 	color_cb_max=255;
 	color_cr_min=134;
 	color_cr_max=255;
+	// Initialise random values
+	srand(time(NULL));
+	chooseRandomIncrementAvoidance();
 }
 void orange_avoider_periodic() {
 	// Check the amount of orange. If this is above a threshold
@@ -43,9 +49,9 @@ uint8_t increase_nav_heading(int32_t *heading, int32_t increment)
   *heading = *heading + increment;
   // Check if your turn made it go out of bounds...
   INT32_ANGLE_NORMALIZE(*heading); // HEADING HAS INT32_ANGLE_FRAC....
-  return TRUE;
+  return FALSE;
 }
-uint8_t moveWaypointForwards(uint8_t waypoint){
+uint8_t moveWaypointForwards(uint8_t waypoint, float distanceMeters){
 	  struct EnuCoor_i new_coor;
 	  struct EnuCoor_i *pos = stateGetPositionEnu_i(); // Get your current position
 
@@ -54,9 +60,8 @@ uint8_t moveWaypointForwards(uint8_t waypoint){
 	  float cos_heading = cosf(ANGLE_FLOAT_OF_BFP(nav_heading));
 
 	  // Now determine where to place the waypoint you want to go to
-	  float NAV_LINE_AVOID_SEGMENT_LENGTH = 1.50; // Meters
-	  new_coor.x = pos->x + POS_BFP_OF_REAL(sin_heading * (NAV_LINE_AVOID_SEGMENT_LENGTH));
-	  new_coor.y = pos->y + POS_BFP_OF_REAL(cos_heading * (NAV_LINE_AVOID_SEGMENT_LENGTH));
+	  new_coor.x = pos->x + POS_BFP_OF_REAL(sin_heading * (distanceMeters));
+	  new_coor.y = pos->y + POS_BFP_OF_REAL(cos_heading * (distanceMeters));
 	  new_coor.z = pos->z; // Keep the height the same
 
 	  // Set the waypoint to the calculated position
@@ -65,4 +70,15 @@ uint8_t moveWaypointForwards(uint8_t waypoint){
 	  return FALSE;
 }
 
+uint8_t chooseRandomIncrementAvoidance(){
+
+	int r = rand() % 2;
+	if(r==0){
+		incrementForAvoidance=350;
+	}
+	else{
+		incrementForAvoidance=-350;
+	}
+	return FALSE;
+}
 
