@@ -67,13 +67,13 @@
     </block>
     <block name="StayGoal">
       <go wp="GOAL"/>
+     <exception cond="block_time > 1" deroute="MoveGoalForward"/>
+     <exception cond="!safeToGoForwards" deroute="ChangeHeading"/>
     </block>
     <block name="MoveGoalForward">
-      <!-- safeToGoForwards ,a function one can call from the Modulee -->
-      <while cond="safeToGoForwards">
-        <call fun="moveWaypointForwards(WP_GOAL)"/>
-        <go wp="GOAL"/>
-      </while>
+      <call fun="moveWaypointForwards(WP_GOAL)"/>  
+      <deroute block="StayGoal"/>
+      <exception cond="!safeToGoForwards" deroute="ChangeHeading"/>
     </block>
     <block name="ChangeHeading">
       <call fun="NavSetWaypointHere(WP_STDBY)"/>

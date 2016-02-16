@@ -62,7 +62,7 @@ uint8_t moveWaypointForwards(uint8_t waypoint){
 	  // Set the waypoint to the calculated position
 	  waypoint_set_xy_i(waypoint, new_coor.x, new_coor.y);
 
-	  return TRUE;
+	  return FALSE;
 }
 
 
