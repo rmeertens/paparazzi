@@ -34,18 +34,14 @@ void orange_avoider_periodic() {
 }
 
 
+/**
+ * Increases the NAV heading. Assumes heading is an INT32_ANGLE. It is bound in this function.
+ */
 uint8_t increase_nav_heading(int32_t *heading, int32_t increment)
 {
   *heading = *heading + increment;
-
   // Check if your turn made it go out of bounds...
-  while(*heading > 360){
-	  *heading-=360;
-  }
-  while(*heading < 0){
-	  *heading+=360;
-  }
-
+  INT32_ANGLE_NORMALIZE(*heading); // HEADING HAS INT32_ANGLE_FRAC....
   return TRUE;
 }
 uint8_t moveWaypointForwards(uint8_t waypoint){

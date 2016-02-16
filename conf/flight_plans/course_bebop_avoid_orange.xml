@@ -14,6 +14,10 @@
     <waypoint lat="51.9905874" lon="4.3767766" name="FA2"/>
     <waypoint lat="51.9906409" lon="4.3767226" name="FA3"/>
     <waypoint lat="51.9906737" lon="4.3768074" name="FA4"/>
+    <waypoint lat="51.990624" lon="4.376845" name="OBST1"/>
+    <waypoint lat="51.990601" lon="4.376782" name="OBST2"/>
+    <waypoint alt="11.5" lat="51.990638" lon="4.376748" name="OBST3"/>
+    <waypoint lat="51.990662" lon="4.376803" name="OBST4"/>
   </waypoints>
   <sectors>
     <sector color="red" name="Flight_Area">
@@ -22,12 +26,16 @@
       <corner name="FA2"/>
       <corner name="FA1"/>
     </sector>
+    <sector color="orange" name="Obstacle_Zone">
+      <corner name="OBST1"/>
+      <corner name="OBST2"/>
+      <corner name="OBST3"/>
+      <corner name="OBST4"/>
+    </sector>
   </sectors>
-
   <exceptions>
-    <!-- Check inside small flight area, then goto Center(Standby) -->
-    <exception cond="!InsideFlight_Area(GetPosX(), GetPosY())" deroute="land here"/>
-    </exceptions>
+    <exception cond="Or(! InsideFlight_Area(GetPosX(), GetPosY()), GetPosAlt() > GetAltRef() + 50)" deroute="Standby"/>
+  </exceptions>
   <blocks>
     <block name="Wait GPS">
       <call fun="NavKillThrottle()"/>
@@ -56,19 +64,18 @@
       <stay wp="GOAL"/>
     </block>
     <block name="MoveGoalForward">
-	 <while cond="safeToGoForwards">
-	    <call fun="moveWaypointForwards(WP_GOAL)"/>
-	    <stay wp="GOAL"/>
-	 </while> 
+      <while cond="safeToGoForwards">
+        <call fun="moveWaypointForwards(WP_GOAL)"/>
+        <stay wp="GOAL"/>
+      </while>
     </block>
     <block name="Rotate">
-	<call fun="NavSetWaypointHere(WP_STDBY)"/>
-	<while cond="!safeToGoForwards">
-	    <call fun="increase_nav_heading(&nav_heading, 10)"/>
-	    <stay wp="STDBY"/>
-	 </while> 
+      <call fun="NavSetWaypointHere(WP_STDBY)"/>
+      <while cond="!safeToGoForwards">
+        <call fun="increase_nav_heading(&nav_heading, 10)"/>
+        <stay wp="STDBY"/>
+      </while>
     </block>
-
     <block name="land here" strip_button="Land Here" strip_icon="land-right.png">
       <call fun="NavSetWaypointHere(WP_TD)"/>
     </block>

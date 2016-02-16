@@ -4,6 +4,7 @@
 
   <firmware name="rotorcraft">
     <target name="ap" board="bebop"/>
+
     <!--define name="USE_SONAR" value="TRUE"/-->  <!-- As we have a height from Optitrack we dont need to use the sonar -->
 
 	<!-- Subsystem section -->
