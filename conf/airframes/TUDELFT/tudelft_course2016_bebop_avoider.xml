@@ -1,11 +1,17 @@
 <!DOCTYPE airframe SYSTEM "../airframe.dtd">
 
-<airframe name="bebop"> <!-- The name of your airframe, not that important -->
+<!-- And example airframe to be use in the TU DElft Course 2016 -->
+<airframe name="AvoiderBob"> <!-- The name of your airframe -->
 
   <firmware name="rotorcraft">
-    <target name="ap" board="bebop"/>
+    <target name="ap" board="bebop"/> <!-- The type of Autopilot board hardware one uses -->
 
-    <!--define name="USE_SONAR" value="TRUE"/-->  <!-- As we have a height from Optitrack we dont need to use the sonar -->
+    <target name="nps" board="pc">
+      <subsystem name="fdm" type="jsbsim"/>
+      <subsystem name="udp"/>
+    </target>
+
+    <!--define name="USE_SONAR" value="TRUE"/-->
 
 	<!-- Subsystem section -->
     <subsystem name="telemetry" type="transparent_udp"/>
@@ -16,7 +22,7 @@
     <subsystem name="gps" type="datalink"/> <!-- The GPS information also comes over this wifi, as we are sitting in the cyberzoo all the time --> 
     <subsystem name="stabilization" type="indi"/>
     <subsystem name="ahrs" type="int_cmpl_quat">
-      <configure name="USE_MAGNETOMETER" value="FALSE"/>
+      <configure name="USE_MAGNETOMETER" value="FALSE"/> <!-- Heading is from Optitrack, in reguler outside flight case one would use and Magnetometer-->
       <define name="AHRS_USE_GPS_HEADING" value="TRUE"/>
     </subsystem>
     <subsystem name="ins" type="extended"/>
@@ -30,11 +36,20 @@
     <load name="geo_mag.xml"/>
     <load name="air_data.xml"/>
     <load name="send_imu_mag_current.xml"/>
+    <!--load name="logger_file.xml">
+      <define name="FILE_LOGGER_PATH" value="/data/ftp/internal_000"/>
+    </load-->
     <load name="video_thread.xml">
       <define name="VIDEO_THREAD_FPS" value="4"/>
       <define name="VIDEO_THREAD_CAMERA" value="front_camera"/>
       <define name="VIDEO_THREAD_SHOT_PATH" value="/data/ftp/internal_000/images"/>
     </load>
+   <!--
+    <load name="video_rtp_stream.xml">
+      <define name="VIEWVIDEO_QUALITY_FACTOR" value="80"/>
+      <define name="VIEWVIDEO_DOWNSIZE_FACTOR" value="1"/>
+    </load>
+    -->
     <load name="cv_colorfilter.xml">
     </load>
     <load name="orange_avoider.xml"/>
@@ -101,7 +116,7 @@
   <!-- http://wiki.paparazziuav.org/wiki/Subsystem/ahrs#Local_Magnetic_Field -->
   <section name="AHRS" prefix="AHRS_">
     <!-- values used if no GPS fix, on 3D fix is update by geo_mag module -->
-    <!-- Delft -->
+    <!-- Delft, The Netherlands 2014 -->
     <define name="H_X" value="0.3892503"/>
     <define name="H_Y" value="0.0017972"/>
     <define name="H_Z" value="0.9211303"/>
@@ -141,7 +156,6 @@
     <define name="IGAIN_R" value="50"/>
   </section>
 
- 
   <section name="ATTITUDE_REFERENCE" prefix="STABILIZATION_ATTITUDE_">
     <!-- attitude reference generation model -->
     <define name="REF_OMEGA_P" value="450" unit="deg/s"/>
@@ -203,10 +217,7 @@
   </section>
 
   <section name="GUIDANCE_H" prefix="GUIDANCE_H_">
-    <!-- Good weather -->
-    <define name="MAX_BANK" value="20" unit="deg"/>
-    <!-- Bad weather -->
-    <!-- define name="MAX_BANK" value="32" unit="deg"/ -->
+    <define name="MAX_BANK" value="32" unit="deg"/>
     <define name="PGAIN" value="79"/>
     <define name="DGAIN" value="100"/>
     <define name="IGAIN" value="30"/>
@@ -215,6 +226,12 @@
   <section name="NAVIGATION" prefix="NAV_">
     <define  name="CLIMB_VSPEED" value="2.5" />
     <define  name="DESCEND_VSPEED" value="-1.0" />
+  </section>
+
+  <section name="SIMULATOR" prefix="NPS_">
+    <define name="ACTUATOR_NAMES" value="nw_motor, ne_motor, se_motor, sw_motor" type="string[]"/>
+    <define name="JSBSIM_MODEL" value="simple_x_quad_ccw" type="string"/>
+    <define name="SENSORS_PARAMS" value="nps_sensors_params_default.h" type="string"/>
   </section>
 
 <!-- Here you put the modes that your drone can fly in -->
@@ -229,9 +246,9 @@
 
   <section name="BAT">
     <define name="MILLIAMP_AT_FULL_THROTTLE" value="8700"/>
-    <define name="CATASTROPHIC_BAT_LEVEL" value="10.8" unit="V"/>
-    <define name="CRITIC_BAT_LEVEL" value="11.0" unit="V"/>
-    <define name="LOW_BAT_LEVEL" value="11.2" unit="V"/>
+    <define name="CATASTROPHIC_BAT_LEVEL" value="9.3" unit="V"/>
+    <define name="CRITIC_BAT_LEVEL" value="9.6" unit="V"/>
+    <define name="LOW_BAT_LEVEL" value="10.6" unit="V"/>
     <define name="MAX_BAT_LEVEL" value="12.4" unit="V"/>
   </section>
 </airframe>
