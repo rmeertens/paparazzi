@@ -82,7 +82,7 @@
         <arg flag="hobbyking.xml"/>
       </program>
      <program name="NatNet" command="sw/ground_segment/misc/natnet2ivy">
-      <arg flag="-ac" constant="3 @AC_ID"/>
+      <arg flag="-ac 3 @AC_ID"/>
     </program>
 
       <program name="Messages" command="sw/ground_segment/tmtc/messages"/>
