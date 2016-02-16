@@ -35,12 +35,16 @@
     </sector>
   </sectors>    
   <exceptions>
-     <exception cond="Or(! InsideObstacleZone(GetPosX(), GetPosY()), GetPosAlt() > GetAltRef() + 9.4)" deroute="Standby"/>
+     <!--exception cond="Or(! InsideCyberZoo(GetPosX(), GetPosY()), GetPosAlt() > GetAltRef() + 9.4)" deroute="Standby"/-->
   </exceptions>
   <blocks>
     <block name="Wait GPS">
       <call fun="NavKillThrottle()"/>
       <while cond="!GpsFixValid()"/>
+    </block>
+    <block name="Geo init">
+      <while cond="LessThan(NavBlockTime(), 2)"/>
+      <call fun="NavSetAltitudeReferenceHere()"/>
     </block>
     <block name="Holding point">
       <call fun="NavKillThrottle()"/>
@@ -51,7 +55,7 @@
       <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
     </block>
     <block key="t" name="Takeoff" strip_button="Takeoff" strip_icon="takeoff.png">
-      <exception cond="stateGetPositionEnu_f()->z > 1.0" deroute="Standby"/>
+      <exception cond="stateGetPositionEnu_f()->z > 1.25" deroute="Standby"/>
       <call fun="NavSetWaypointHere(WP_CLIMB)"/>
       <stay climb="nav_climb_vspeed" vmode="climb" wp="CLIMB"/>
     </block>
@@ -62,20 +66,21 @@
       <call fun="NavSetWaypointHere(WP_GOAL)"/>
     </block>
     <block name="StayGoal">
-      <stay wp="GOAL"/>
+      <go wp="GOAL"/>
     </block>
     <block name="MoveGoalForward">
       <!-- safeToGoForwards ,a function one can call from the Modulee -->
-      <while cond="safeToGoForwards">
+      <while cond="And(safeToGoForwards,InsideObstacleZone(GetPosX(), GetPosY()))">
         <call fun="moveWaypointForwards(WP_GOAL)"/>
-        <stay wp="GOAL"/>
+        <go wp="GOAL"/>
       </while>
     </block>
     <block name="ChangeHeading">
       <call fun="NavSetWaypointHere(WP_STDBY)"/>
-      <while cond="!safeToGoForwards">
-        <call fun="increase_nav_heading(&nav_heading, 10)"/>
-        <stay wp="STDBY"/>
+      <while cond="1. > safeToGoForwards">
+        <call fun="increase_nav_heading(&nav_heading, 50)"/>
+ 	<call fun="moveWaypointForwards(WP_GOAL)"/>
+        <go wp="STDBY"/>
       </while>
     </block>
     <block key="l" name="Land here" strip_button="Land Here" strip_icon="land-right.png">

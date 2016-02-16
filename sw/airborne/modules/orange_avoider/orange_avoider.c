@@ -16,7 +16,7 @@
 #include "state.h"
 
 uint8_t safeToGoForwards=FALSE;
-int tresholdColorCount = 1000;
+int tresholdColorCount = 200;
 
 void orange_avoider_init() {
 	// Initialise the variables of the colorfilter to accept orange
@@ -31,6 +31,7 @@ void orange_avoider_periodic() {
 	// Check the amount of orange. If this is above a threshold
 	// you want to turn a certain amount of degrees
 	safeToGoForwards = color_count < tresholdColorCount;
+	printf("Checking if this funciton is called %d treshold: %d now: %d \n", color_count, tresholdColorCount, safeToGoForwards);
 }
 
 
