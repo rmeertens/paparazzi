@@ -55,6 +55,7 @@
       <stay climb="nav_climb_vspeed" vmode="climb" wp="CLIMB"/>
     </block>
     <block name="Standby" strip_button="Standby" strip_icon="home.png">
+      <call fun="NavSetWaypointHere(WP_STDBY)"/>
       <stay wp="STDBY"/>
     </block>
     <block name="START" strip_button="Go" strip_icon="lookfore.png">
@@ -64,16 +65,17 @@
       <stay wp="GOAL"/>
     </block>
     <block name="MoveGoalForward">
-      <while cond="safeToGoForwards">
+      <while cond="And(safeToGoForwards,InsideObstacle_Zone(GetPosX(), GetPosY()))">
         <call fun="moveWaypointForwards(WP_GOAL)"/>
         <stay wp="GOAL"/>
       </while>
     </block>
     <block name="Rotate">
       <call fun="NavSetWaypointHere(WP_STDBY)"/>
-      <while cond="!safeToGoForwards">
+      <while cond="And(!safeToGoForwards,InsideObstacle_Zone(WaypointX(WP_GOAL),WaypointY(WP_GOAL)))">
         <call fun="increase_nav_heading(&nav_heading, 10)"/>
-        <stay wp="STDBY"/>
+	 <call fun="moveWaypointForwards(WP_GOAL)"/>        
+	<stay wp="STDBY"/>
       </while>
     </block>
     <block name="land here" strip_button="Land Here" strip_icon="land-right.png">
