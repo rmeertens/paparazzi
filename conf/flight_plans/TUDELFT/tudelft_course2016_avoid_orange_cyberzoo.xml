@@ -70,18 +70,19 @@
     </block>
     <block name="MoveGoalForward">
       <!-- safeToGoForwards ,a function one can call from the Modulee -->
-      <while cond="And(safeToGoForwards,InsideObstacleZone(GetPosX(), GetPosY()))">
+      <while cond="safeToGoForwards">
         <call fun="moveWaypointForwards(WP_GOAL)"/>
         <go wp="GOAL"/>
       </while>
     </block>
     <block name="ChangeHeading">
       <call fun="NavSetWaypointHere(WP_STDBY)"/>
-      <while cond="1. > safeToGoForwards">
+      <while cond="1">
         <call fun="increase_nav_heading(&nav_heading, 50)"/>
  	<call fun="moveWaypointForwards(WP_GOAL)"/>
         <go wp="STDBY"/>
       </while>
+      <exception cond="safeToGoForwards" deroute="START"/>
     </block>
     <block key="l" name="Land here" strip_button="Land Here" strip_icon="land-right.png">
       <call fun="NavSetWaypointHere(WP_TD)"/>
