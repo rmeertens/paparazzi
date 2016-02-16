@@ -34,10 +34,10 @@
 <airframe name="quadrotor_lisa_s">
 
   <servos driver="Pwm">
-    <servo name="NE" no="0" min="0" neutral="50" max="1000"/>
-    <servo name="SE" no="1" min="0" neutral="50" max="1000"/>
-    <servo name="SW" no="2" min="0" neutral="50" max="1000"/>
-    <servo name="NW" no="3" min="0" neutral="50" max="1000"/>
+    <servo name="NE" no="2" min="0" neutral="50" max="1000"/>
+    <servo name="SE" no="3" min="0" neutral="50" max="1000"/>
+    <servo name="SW" no="0" min="0" neutral="50" max="1000"/>
+    <servo name="NW" no="1" min="0" neutral="50" max="1000"/>
   </servos>
 
   <commands>
@@ -79,7 +79,7 @@
 
     <define name="BODY_TO_IMU_PHI" value="0.4" unit="deg"/>
     <define name="BODY_TO_IMU_THETA" value="-.66" unit="deg"/>
-    <define name="BODY_TO_IMU_PSI" value="-13." unit="deg"/>
+    <define name="BODY_TO_IMU_PSI" value="-193." unit="deg"/>
   </section>
 
  <section name="AUTOPILOT">
@@ -221,7 +221,7 @@
 	<configure name="STEREO_BAUD" value="B115200"/>
 </load>
 
-   <load name="stereocam_forward_velocity.xml"/>
+   <load name="stereocam_keep_distance.xml"/>
  </modules>
 
   <firmware name="rotorcraft">
@@ -231,6 +231,9 @@
         <subsystem name="radio_control" type="superbitrf_rc">
         <define name="RADIO_MODE" value="RADIO_GEAR"/>
         <!--<define name="RADIO_KILL_SWITCH" value="RADIO_GEAR"/>-->
+<!--define name="RADIO_TRANSMITTER_ID" value="1335259868"/--> <!-- Esden (1BitSquared) Dx6i: TX 1 -->
+        <!--define name="RADIO_TRANSMITTER_CHAN" value="6"/-->
+        <!--define name="RADIO_TRANSMITTER_PROTOCOL" value="0x01"/-->
         <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
       </subsystem>
 

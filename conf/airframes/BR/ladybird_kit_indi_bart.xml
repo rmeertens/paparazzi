@@ -197,8 +197,10 @@
     <target name="ap" board="lisa_s_1.0">
       <subsystem name="radio_control" type="superbitrf_rc">
         <define name="RADIO_MODE" value="RADIO_GEAR"/>
+	
         <!--<define name="RADIO_KILL_SWITCH" value="RADIO_GEAR"/>-->
         <define name="USE_PERSISTENT_SETTINGS" value="TRUE"/>
+
       </subsystem>
 
       <configure name="AHRS_PROPAGATE_FREQUENCY" value="500"/>
