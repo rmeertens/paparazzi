@@ -1,5 +1,11 @@
 <!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
 <flight_plan alt="1.5" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="8" name="Bebop avoid orange TU Delft Cyberzoo" security_height="0.4">
+  <header>
+#include "autopilot.h"
+#include "subsystems/ahrs.h"
+#include "subsystems/electrical.h"
+#include "subsystems/datalink/datalink.h"
+  </header>
   <waypoints>
     <!-- Basic Home point -->
     <waypoint name="HOME" x="0.0" y="0.0" height="0"/>
@@ -36,6 +42,9 @@
   </sectors>    
   <exceptions>
      <!--<exception cond="!InsideCyberZoo(GetPosX(), GetPosY())" deroute="Standby"/>-->
+    <!-- Check if battery is empty, then Land Here -->
+    <exception cond="electrical.bat_low && !(nav_block == IndexOfBlock('Land')) && !(nav_block == IndexOfBlock('Flare')) && !(nav_block == IndexOfBlock('Landed'))" deroute="Land"/>
+    <exception cond="electrical.bat_critical && !(nav_block == IndexOfBlock('Land')) && !(nav_block == IndexOfBlock('Flare')) && !(nav_block == IndexOfBlock('Landed'))" deroute="Land here"/>
   </exceptions>
   <blocks>
     <block name="Wait GPS">
