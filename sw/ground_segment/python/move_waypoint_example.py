@@ -15,7 +15,6 @@ from ivy_msg_interface import IvyMessagesInterface
 from pprzlink.message import PprzMessage
 
 
-
 class WaypointMover(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
