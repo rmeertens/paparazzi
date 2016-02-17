@@ -561,7 +561,7 @@ gboolean timeout_transmit_callback(gpointer data) {
         }
 
         if (fp == NULL) {
-           printf("I couldn't open results.dat for writing.\n");
+           printf("I couldn't open file for writing.\n");
            exit(0);
         }
         else {
