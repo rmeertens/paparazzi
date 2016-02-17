@@ -27,7 +27,9 @@
 #include "modules/computer_vision/cv.h"
 #include "modules/computer_vision/colorfilter.h"
 
+#include "subsystems/datalink/telemetry.h"
 #include <stdio.h>
+#include <std.h>
 
 // Filter Settings
 uint8_t color_lum_min = 105;
@@ -50,7 +52,7 @@ bool_t colorfilter_func(struct image_t* img)
       color_cb_min,color_cb_max,
       color_cr_min,color_cr_max
       );
-
+  DOWNLINK_SEND_COLORFILTER(DefaultChannel, DefaultDevice, &color_count);
   return FALSE;
 }
 

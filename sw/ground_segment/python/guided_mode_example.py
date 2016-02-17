@@ -132,7 +132,7 @@ class Guidance(object):
 
 
 if __name__ == '__main__':
-    ac_id = 40
+    ac_id = 30
     try:
         g = Guidance(ac_id)
         sleep(0.1)
@@ -143,8 +143,6 @@ if __name__ == '__main__':
         g.goto_ned_relative(north=-5.0, east=-5.0, down=-2.0, yaw=-radians(45))
         sleep(10)
         g.goto_body_relative(forward=0.0, right=5.0, down=2.0)
-        sleep(10)
-        g.move_at_vel(north=3.0)
         sleep(10)
         g.set_nav_mode()
         sleep(0.2)

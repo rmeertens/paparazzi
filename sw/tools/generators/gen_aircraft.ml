@@ -122,13 +122,6 @@ let module_xml2mk = fun f target firmware m ->
         let targets = Gen_common.targets_of_field section Env.default_module_targets in
         if Gen_common.test_targets target targets then section else Xml.Element ("makefile", [], [])
       in
-      (* keep section if firmware is also matching or not speficied *)
-      let section = begin
-        try
-          if Xml.attrib section "firmware" = firmware then section
-          else Xml.Element ("makefile", [], [])
-        with _ -> section end
-      in
       Xml.iter
       (fun field ->
           match String.lowercase (Xml.tag field) with
@@ -199,8 +192,7 @@ let subsystem_configure_xml2mk = fun f s ->
   let s_config, _ = ExtXml.partition_tag "configure" (Xml.children s) in
   List.iter (configure_xml2mk f) s_config
 
-(** if xml node valid module, do notihg, otherwise fall back to subsystem *)
-let fallback_subsys_xml2mk = fun f global_targets firmware target xml ->
+let mod_or_subsys_xml2mk = fun f global_targets firmware target xml ->
   try
     ignore(Gen_common.get_module xml global_targets)
   with Gen_common.Subsystem _file -> subsystem_xml2mk f firmware xml
