@@ -28,7 +28,7 @@
 # Define some default programs and commands (if not already set by e.g. Makefile.arm-linux
 CC  ?= gcc
 CXX ?= g++
-LD  ?= $(CC)
+LD  ?= $(CXX)
 
 # Launch with "make Q=''" to get full command display
 Q=@
@@ -103,9 +103,8 @@ elf: $(OBJDIR)/$(TARGET).elf
 .PRECIOUS :   $(OBJ_C_LINUX) $(OBJ_CPP_LINUX)
 %.elf:   $(OBJ_C_LINUX) $(OBJ_CPP_LINUX)
 	@echo LD $@
-	$(Q)if (expr "$($(TARGET).cpp_srcs)"); \
-		  then $(CXX) $(CXXFLAGS) $(OBJ_CPP_LINUX) $(OBJ_C_LINUX) --output $@ $(LDFLAGS) $($(TARGET).LDFLAGS); \
-		  else $(CC) $(CFLAGS) $(OBJ_C_LINUX) --output $@ $(LDFLAGS) $($(TARGET).LDFLAGS); fi
+	$(Q) $(CXX) $(CXXFLAGS) $(OBJ_CPP_LINUX) $(OBJ_C_LINUX) --output $@ $(LDFLAGS) $($(TARGET).LDFLAGS)
+		  
 
 # Compile: create object files from C source files
 $(OBJDIR)/%.o : %.c $(OBJDIR)/../Makefile.ac
@@ -130,6 +129,6 @@ $(OBJDIR)/%.o : %.cpp $(OBJDIR)/../Makefile.ac
 #
 ifneq ($(MAKECMDGOALS),clean)
 DEPS = $(addprefix $(OBJDIR)/,$($(TARGET).srcs:.c=.d))
-DEPS += $(addprefix $(OBJDIR)/,$($(TARGET).srcs:.cpp=.d))
+DEPS += $(addprefix $(OBJDIR)/,$($(TARGET).cpp_srcs:.cpp=.d))
 -include $(DEPS)
 endif

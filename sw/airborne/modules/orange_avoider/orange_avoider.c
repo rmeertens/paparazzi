@@ -16,11 +16,12 @@
 #include "state.h"
 #include <time.h>
 #include <stdlib.h>
-
+//#include "opencv2/core.hpp"
+//#include "opencv/cv.h"
 uint8_t safeToGoForwards=FALSE;
 int tresholdColorCount = 200;
 int32_t incrementForAvoidance;
-
+extern void testImage();
 void orange_avoider_init() {
 	// Initialise the variables of the colorfilter to accept orange
 	color_lum_min=0;
@@ -37,6 +38,7 @@ void orange_avoider_periodic() {
 	// Check the amount of orange. If this is above a threshold
 	// you want to turn a certain amount of degrees
 	safeToGoForwards = color_count < tresholdColorCount;
+	testImage();
 	printf("Checking if this funciton is called %d treshold: %d now: %d \n", color_count, tresholdColorCount, safeToGoForwards);
 }
 

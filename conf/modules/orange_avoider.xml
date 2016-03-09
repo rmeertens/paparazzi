@@ -11,6 +11,11 @@
   <periodic fun="orange_avoider_periodic()" freq="4"/>
   <makefile>
     <file name="orange_avoider.c"/>
+   <raw>
+	ap.cpp_srcs+=example_opencv.cpp
+	ap.CFLAGS+=-I$(ORANGE_AVOIDER_DIR)/opencv
+    	ap.LDFLAGS+=-L$(ORANGE_AVOIDER_DIR)/lib -lopencv_core
+   </raw>
   </makefile>
 </module>
 
