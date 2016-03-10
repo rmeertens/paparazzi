@@ -46,8 +46,6 @@ CFLAGS += -DPPRZLINK_UNALIGNED_ACCESS=1
 
 # add ARM specifc flags to CFLAGS, LDFLAGS
 CFLAGS += $(FLOAT_ABI) $(ARCH_CFLAGS)
-LDFLAGS += $(FLOAT_ABI)
-CXXFLAGS += $(FLOAT_ABI) $(ARCH_CFLAGS)
 
 # include the common linux Makefile (common CFLAGS, actual targets)
 include $(PAPARAZZI_SRC)/conf/Makefile.linux
