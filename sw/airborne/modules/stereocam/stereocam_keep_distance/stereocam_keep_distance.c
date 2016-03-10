@@ -150,10 +150,13 @@ void stereocam_keep_distance_periodic()
 
     float stab_pitch_pgain = 0.04;
     float pitchDiff = closest - ref_disparity_to_keep;
-    float pitchToTake = -0.03;//stab_pitch_pgain*pitchDiff;
+    float pitchToTake = -0.08;//stab_pitch_pgain*pitchDiff;
     if (dangerousClose(closest)) {
       pitchToTake = 0.15;
     }
+    else if (simplyClose(closest)) {
+         pitchToTake = 0.6;
+       }
     ref_pitch = 0.0;
     float max_roll = 0.25;
     float max_pitch_to_take = 0.25;
@@ -207,24 +210,25 @@ void stereocam_keep_distance_periodic()
     } else if (ref_roll < -0.15) {
       ref_roll = -0.15;
     }
-    float addedRollJoystick = ((float)radio_control.values[RADIO_ROLL]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
-    if (addedRollJoystick > 0.25) {
-      addedRollJoystick = 0.25;
-    } else if (addedRollJoystick < -0.25) {
-      addedRollJoystick = -0.25;
-    }
-    ref_roll += addedRollJoystick;
-
-
-    float addedPitchJoystick = ((float)radio_control.values[RADIO_PITCH]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
-    if (addedPitchJoystick > 0.25) {
-      addedPitchJoystick = 0.25;
-    } else if (addedPitchJoystick < -0.25) {
-      addedPitchJoystick = -0.25;
-    }
-    ref_pitch += addedPitchJoystick;
-    DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &dist, &guidoVelocityHor, &guidoVelocityHor,
+//    float addedRollJoystick = ((float)radio_control.values[RADIO_ROLL]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
+//    if (addedRollJoystick > 0.25) {
+//      addedRollJoystick = 0.25;
+//    } else if (addedRollJoystick < -0.25) {
+//      addedRollJoystick = -0.25;
+//    }
+//    ref_roll += addedRollJoystick;
+//
+//
+//    float addedPitchJoystick = ((float)radio_control.values[RADIO_PITCH]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
+//    if (addedPitchJoystick > 0.25) {
+//      addedPitchJoystick = 0.25;
+//    } else if (addedPitchJoystick < -0.25) {
+//      addedPitchJoystick = -0.25;
+//    }
+//    ref_pitch += addedPitchJoystick;
+    /*DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &dist, &guidoVelocityHor, &guidoVelocityHor,
                                   &guidoVelocityZ, &pointsDetected, &stabilisationLateralGains.pGain);
+  	  */
   }
 }
 
@@ -260,7 +264,10 @@ void guidance_h_module_read_rc(void)
 void guidance_h_module_run(bool_t in_flight)
 {
   struct Int32Eulers command;
-  float addedRollJoystick = ((float)radio_control.values[RADIO_ROLL]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
+  float yawRate = 0.2*((float)radio_control.values[RADIO_YAW]) / ((float)MAX_PPRZ);
+  headingStereocamStab+=yawRate;
+
+  float addedRollJoystick = 0.4*((float)radio_control.values[RADIO_ROLL]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
   if (addedRollJoystick > 0.25) {
     addedRollJoystick = 0.25;
   } else if (addedRollJoystick < -0.25) {
@@ -268,12 +275,13 @@ void guidance_h_module_run(bool_t in_flight)
   }
 
 
-  float addedPitchJoystick = ((float)radio_control.values[RADIO_PITCH]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
+  float addedPitchJoystick = 0.4*((float)radio_control.values[RADIO_PITCH]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
   if (addedPitchJoystick > 0.25) {
     addedPitchJoystick = 0.25;
   } else if (addedPitchJoystick < -0.25) {
     addedPitchJoystick = -0.25;
   }
+//  addedPitchJoystick = 0.1;
 
   command.phi = ANGLE_BFP_OF_REAL(ref_roll + addedRollJoystick);
   command.theta = ANGLE_BFP_OF_REAL((-1.0 * ref_pitch) + addedPitchJoystick);
