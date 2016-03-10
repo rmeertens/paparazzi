@@ -32,11 +32,15 @@
 bool_t opencv_func(struct image_t* img);
 bool_t opencv_func(struct image_t* img)
 {
+
   if (img->type == IMAGE_YUV422)
   {
     // Call OpenCV (C++ from paparazzi C function)
     opencv_example((char*) img->buf, img->w, img->h);
   }
+
+// opencv_example(NULL, 10,10);
+
   return FALSE;
 }
 
