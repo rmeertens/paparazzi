@@ -37,6 +37,7 @@ ifeq ($(shell which $(PREFIX)-gcc),)
 endif
 
 CC   = $(PREFIX)-gcc
+CXX   = $(PREFIX)-g++
 LD   = $(PREFIX)-g++
 AR   = $(PREFIX)-ar
 CP   = $(PREFIX)-objcopy
