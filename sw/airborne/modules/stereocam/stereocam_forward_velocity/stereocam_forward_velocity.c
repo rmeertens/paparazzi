@@ -345,24 +345,6 @@ void stereocam_forward_velocity_periodic()
 	else if (ref_roll<-0.15){
 		ref_roll=-0.15;
 	}
-    float addedRollJoystick = ((float)radio_control.values[RADIO_ROLL])/((float)MAX_PPRZ);//RADIO_CONTROL_NB_CHANNEL
-    if(addedRollJoystick>0.25){
-    	addedRollJoystick=0.25;
-	}
-	else if (addedRollJoystick<-0.25){
-		addedRollJoystick=-0.25;
-	}
-    ref_roll+= addedRollJoystick;
-
-
-    float addedPitchJoystick = ((float)radio_control.values[RADIO_PITCH])/((float)MAX_PPRZ);//RADIO_CONTROL_NB_CHANNEL
-       if(addedPitchJoystick>0.25){
-    	   addedPitchJoystick=0.25;
-   	}
-   	else if (addedPitchJoystick<-0.25){
-   		addedPitchJoystick=-0.25;
-   	}
-    ref_pitch+= addedPitchJoystick;
     DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &disparitiesInDroplet,&dist, &guidoVelocityHor,&guidoVelocityHor,&guidoVelocityZ,&current_state,&totalStabiliseStateCount,&disparityLeft,&disparityRight,&stabilisationLateralGains.pGain);
     DOWNLINK_SEND_REFROLLPITCH(DefaultChannel, DefaultDevice, &ref_roll,&ref_pitch);
 //*/
