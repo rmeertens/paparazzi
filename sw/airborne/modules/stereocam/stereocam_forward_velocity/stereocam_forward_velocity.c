@@ -120,7 +120,7 @@ void stereocam_forward_velocity_periodic()
 {
 
 
-  if (stereocam_data.fresh && stereocam_data.len==3) {
+  if (stereocam_data.fresh) {
     stereocam_data.fresh = 0;
 
     int timeStamp = 0;
@@ -136,14 +136,10 @@ void stereocam_forward_velocity_periodic()
     	 previousThrust=stabilization_cmd[COMMAND_THRUST];
     	 totalStabiliseStateCount=0;
     }
-    if(stereocam_data.data[2]>0){
-    	if(stereocam_data.data[0]>65){
-    		headingStereocamStab +=5.0;
-    	}
-    	else{
-    		headingStereocamStab -=5.0;
+    if(stereocam_data.data[0]>0){
+    	float diff=stereocam_data.data[0]-65;
+    	headingStereocamStab +=3.0*((diff)/65.0);
 
-    	}
     }
 
     while(headingStereocamStab>360.0){
