@@ -165,16 +165,7 @@ void stereocam_keep_distance_periodic()
 
     if (counterStab % 4 == 0) {
       previousThrust += guidoVelocityZ * 0.2 * MAX_PPRZ;
-      /*
-      if(rollToTake>max_roll){
-        ref_roll=max_roll;
-      }
-      else if(rollToTake<(-1.0*max_roll)){
-        ref_roll=-(1.0*max_roll);
-      }
-      else{
-        ref_roll=rollToTake;
-      }*/
+
 
       if (pitchToTake > max_pitch_to_take) {
         ref_pitch = max_pitch_to_take;
@@ -210,25 +201,6 @@ void stereocam_keep_distance_periodic()
     } else if (ref_roll < -0.15) {
       ref_roll = -0.15;
     }
-//    float addedRollJoystick = ((float)radio_control.values[RADIO_ROLL]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
-//    if (addedRollJoystick > 0.25) {
-//      addedRollJoystick = 0.25;
-//    } else if (addedRollJoystick < -0.25) {
-//      addedRollJoystick = -0.25;
-//    }
-//    ref_roll += addedRollJoystick;
-//
-//
-//    float addedPitchJoystick = ((float)radio_control.values[RADIO_PITCH]) / ((float)MAX_PPRZ); //RADIO_CONTROL_NB_CHANNEL
-//    if (addedPitchJoystick > 0.25) {
-//      addedPitchJoystick = 0.25;
-//    } else if (addedPitchJoystick < -0.25) {
-//      addedPitchJoystick = -0.25;
-//    }
-//    ref_pitch += addedPitchJoystick;
-    /*DOWNLINK_SEND_STEREO_VELOCITY(DefaultChannel, DefaultDevice, &closest, &dist, &guidoVelocityHor, &guidoVelocityHor,
-                                  &guidoVelocityZ, &pointsDetected, &stabilisationLateralGains.pGain);
-  	  */
   }
 }
 
