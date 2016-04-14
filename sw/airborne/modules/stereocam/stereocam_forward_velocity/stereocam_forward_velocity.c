@@ -72,9 +72,9 @@ float velocityAverageAlpha = 0.65;
 float previousHorizontalVelocity = 0.0;
 float previousVerticalVelocity = 0.0;
 //#define DANGEROUS_CLOSE_DISPARITY 24
-int DANGEROUS_CLOSE_DISPARITY=30;
+int DANGEROUS_CLOSE_DISPARITY=80;
 //#define CLOSE_DISPARITY 18
-#define INIT_CLOSE_DISP 22
+#define INIT_CLOSE_DISP 60
 int CLOSE_DISPARITY=INIT_CLOSE_DISP;
 //#define LOW_AMOUNT_PIXELS_IN_DROPLET 20
 int LOW_AMOUNT_PIXELS_IN_DROPLET=20;
@@ -136,11 +136,12 @@ void stereocam_forward_velocity_periodic()
     	 previousThrust=stabilization_cmd[COMMAND_THRUST];
     	 totalStabiliseStateCount=0;
     }
-    if(stereocam_data.data[0]>0){
-    	float diff=stereocam_data.data[0]-65;
-    	headingStereocamStab +=3.0*((diff)/65.0);
+    if(stereocam_data.data[1]>0){
+    	float diff=stereocam_data.data[1]-128;
+    	headingStereocamStab +=3.0*((diff)/128.0);
 
     }
+    uint8_t closest = stereocam_data.data[0];
 
     while(headingStereocamStab>360.0){
     	headingStereocamStab-=360.0;
@@ -150,6 +151,34 @@ void stereocam_forward_velocity_periodic()
     }
     nav_set_heading_deg(headingStereocamStab);
 
+
+    // Now keep distance
+    ref_pitch = 0.0;
+     ref_roll = 0.0;
+
+     float stab_pitch_pgain = 0.04;
+     float pitchDiff = closest - ref_disparity_to_keep;
+     float pitchToTake = -0.08;//stab_pitch_pgain*pitchDiff;
+     if (dangerousClose(closest)) {
+       pitchToTake = 0.8;
+     }
+     else if (simplyClose(closest)) {
+          pitchToTake = 0.20;
+        }
+     ref_pitch = 0.0;
+     float max_roll = 0.25;
+     float max_pitch_to_take = 0.25;
+
+       if (pitchToTake > max_pitch_to_take) {
+         ref_pitch = max_pitch_to_take;
+       } else if (pitchToTake < -1 * max_pitch_to_take) {
+         ref_pitch = -1 * max_pitch_to_take;
+       } else {
+         ref_pitch = pitchToTake;
+       }
+
+
+
     ref_pitch += pitch_compensation;
     ref_roll += roll_compensation;
     float maxRefPitch = 0.25;
@@ -158,14 +187,6 @@ void stereocam_forward_velocity_periodic()
 	}
 	else if (ref_pitch<-1*maxRefPitch){
 		ref_pitch=-1*maxRefPitch;
-	}
-
-
-    if(ref_roll>0.15){
-    	ref_roll=0.15;
-	}
-	else if (ref_roll<-0.15){
-		ref_roll=-0.15;
 	}
   }
 }
