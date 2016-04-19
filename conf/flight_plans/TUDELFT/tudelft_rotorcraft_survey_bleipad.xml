@@ -1,0 +1,51 @@
+<!DOCTYPE flight_plan SYSTEM "../flight_plan.dtd">
+
+<flight_plan alt="5" ground_alt="0" lat0="52.124464" lon0="4.467629" max_dist_from_home="75" name="IMAV2015_competition_outdoor" security_height="2">
+  <waypoints>
+    <waypoint name="HOME" x="0.0" y=".0"/>
+    <waypoint name="CLIMB" x="-7.6" y="15.4"/>
+    <waypoint name="STDBY" x="-3.7" y="24.0"/>
+    <waypoint lat="52.124530" lon="4.467599" name="TD"/>
+    <waypoint lat="52.124464" lon="4.467629" name="_green1A"/>
+    <waypoint lat="52.124464" lon="4.467629" name="_green1B"/>
+    <waypoint lat="52.124464" lon="4.467629" name="_green1C"/>
+    <waypoint lat="52.124464" lon="4.467629" name="CAM"/>
+    <waypoint lat="52.124464" lon="4.467629" name="_green1D"/>
+    <waypoint lat="52.124464" lon="4.467629" name="_green1E"/>
+    <waypoint lat="52.124464" lon="4.467629" name="_green1F"/>
+    <waypoint lat="52.124466" lon="4.468372" name="_red1"/>
+    <waypoint lat="52.124375" lon="4.468550" name="_red2"/>
+    <waypoint lat="52.124259" lon="4.468449" name="_red3"/>
+    <waypoint lat="52.124313" lon="4.467331" name="_red4"/>
+    <waypoint lat="52.124395" lon="4.466824" name="_red5"/>
+    <waypoint lat="52.124743" lon="4.466965" name="_red6"/>
+    <waypoint lat="52.124746" lon="4.467451" name="_red7"/>
+    <waypoint lat="52.124596" lon="4.468050" name="_red8"/>
+  </waypoints>
+  <sectors>
+    <sector color="red" name="RED">
+      <corner name="_red1"/>
+      <corner name="_red2"/>
+      <corner name="_red3"/>
+      <corner name="_red4"/>
+      <corner name="_red5"/>
+      <corner name="_red6"/>
+      <corner name="_red7"/>
+      <corner name="_red8"/>
+    </sector>
+    <sector color="green" name="GREEN1">
+      <corner name="_green1A"/>
+      <corner name="_green1B"/>
+      <corner name="_green1C"/>
+      <corner name="_green1D"/>
+      <corner name="_green1E"/>
+      <corner name="_green1F"/>
+    </sector>
+  </sectors>
+  <includes>
+    <include name="Mission" procedure="tudelft_rotorcraft_survey_mission_bleipad.xml"/>
+  </includes>
+  <blocks>
+    <block name="Dummy"/>
+  </blocks>
+</flight_plan>

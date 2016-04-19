@@ -1,0 +1,133 @@
+<!DOCTYPE procedure SYSTEM "../flight_plan.dtd">
+
+<procedure>
+
+  <header>
+#include "autopilot.h"
+#include "subsystems/electrical.h"
+#ifdef dc_Survey
+#define LINE_START_FUNCTION dc_Survey(dc_distance_interval);
+#define LINE_STOP_FUNCTION {dc_autoshoot = DC_AUTOSHOOT_STOP;}
+#endif
+#ifndef DropOpen
+#define DropOpen() FALSE
+#endif
+#ifndef StartVision
+#define StartVision() FALSE
+#endif
+#ifndef StartVisionLand
+#define StartVisionLand() FALSE
+#endif
+#ifndef StopVision
+#define StopVision() FALSE
+#endif
+#define WpAlt(X) (30)
+  </header>
+
+  <exceptions>
+      <exception cond="electrical.bat_low && (exception_flag[0] == 0)" deroute="Standby" exec="set_exception_flag(0)"/>
+      <exception cond="electrical.bat_critical && (exception_flag[1] == 0)" deroute="land_here" exec="set_exception_flag(1)"/>
+    <exception cond="(!InsideRED(GetPosX(), GetPosY()) && !(nav_block == IndexOfBlock('flare')) && !(nav_block == IndexOfBlock('landed')) && !(nav_block == IndexOfBlock('WaitGPS')) && !(nav_block == IndexOfBlock('GeoInit')))" deroute="land_emergency"/>
+  </exceptions>
+
+  <blocks>
+
+<!-- BOOT -->
+    <block name="WaitGPS">
+      <call fun="NavKillThrottle()"/>
+      <while cond="!GpsFixValid()"/>
+    </block>
+    <block name="GeoInit">
+      <while cond="LessThan(NavBlockTime(), 10)"/>
+      <call fun="NavSetGroundReferenceHere()"/>
+    </block>
+    <block name="holding_point">
+      <call fun="NavKillThrottle()"/>
+      <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
+    </block>
+
+<!-- START -->
+    <block name="Start Engine" strip_button="Start Engine" strip_icon="resurrect.png" group="engine">
+      <call fun="NavResurrect()"/>
+      <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
+    </block>
+    <block name="Takeoff-Standby" strip_button="Takeoff-Standby" strip_icon="takeoff.png" group="takeoff">
+      <exception cond="stateGetPositionEnu_f()->z > 10.0" deroute="Standby"/>
+      <call fun="NavSetWaypointHere(WP_CLIMB)"/>
+      <stay climb="nav_climb_vspeed" vmode="climb" wp="CLIMB"/>
+    </block>
+    <block name="Takeoff-Map" strip_button="Takeoff-Map" strip_icon="survey.png" group="takeoff">
+      <exception cond="stateGetPositionEnu_f()->z > 10.0" deroute="SurveyPoly"/>
+      <call fun="NavSetWaypointHere(WP_CLIMB)"/>
+      <stay climb="nav_climb_vspeed" vmode="climb" wp="CLIMB"/>
+    </block>
+
+<!-- OBSERVE -->
+    <block name="Standby" strip_button="Standby" strip_icon="home.png" group="hover">
+      <stay wp="STDBY"/>
+    </block>
+    <block name="CAM" strip_button="Follow-Vision-Geolocation-Results" strip_icon="lookdown.png" group="hover">
+      <stay wp="CAM"/>
+    </block>
+    <block name="circle CV" pre_call="nav_set_heading_towards_waypoint(WP_CAM)">
+      <circle radius="nav_radius" wp="CAM"/>
+    </block>
+<!-- SURVEYS -->
+<!--
+    <block group="survey" name="Survey S1-S2 NS" strip_button="Survey-NS-S1-S2" strip_icon="survey.png">
+      <call fun="nav_survey_rectangle_rotorcraft_setup(WP_S1, WP_S2, sweep, NS)"/>
+      <deroute block="Survey RECTANGLE RUN"/>
+    </block>
+    <block group="survey" name="Survey S1-S2 EW" strip_button="Survey-EW-S1-S2" strip_icon="survey_we.png">
+      <call fun="nav_survey_rectangle_rotorcraft_setup(WP_S1, WP_S2, sweep, WE)"/>
+      <deroute block="Survey RECTANGLE RUN"/>
+    </block>
+    <block name="Survey RECTANGLE RUN">
+      <exception cond="rectangle_survey_sweep_num >= 1" deroute="Standby"/>
+      <call fun="nav_survey_rectangle_rotorcraft_run(WP_S1, WP_S2)"/>
+    </block>
+-->
+    <block group="survey" name="SurveyPoly" strip_button="Survey-Polygon-S1-S2-S3-S4" strip_icon="googleearth.png">
+      <call fun="nav_survey_poly_setup_towards(WP_S1, 4, sweep, WP_S2)"/>
+      <deroute block="Survey Poly RUN"/>
+    </block>
+    <block name="Survey Poly RUN">
+      <exception cond="PolySurveySweepNum >= 5" deroute="Standby"/>
+      <call fun="nav_survey_poly_run()"/>
+    </block>
+
+<!-- LANDINGS -->
+    <block name="land_here" strip_button="Land Here" strip_icon="downdown.png" group="landing">
+      <call fun="NavCopyWaypoint(WP_CAM,WP_TD)"/><!-- Backup TD location -->
+      <call fun="NavSetWaypointHere(WP_TD)"/>
+      <deroute block="flare"/>
+    </block>
+    <block name="land" strip_button="Land at TD" strip_icon="land-right.png" group="landing">
+      <go wp="TD"/>
+      <call fun="StartVisionLand()"/>
+      <deroute block="flare"/>
+    </block>
+    <block name="visual_flare" strip_button="VisualLanding-CAM" strip_icon="cam_lock.png" group="landing">
+      <exception cond="NavDetectGround()" deroute="holding_point"/>
+      <exception cond="!nav_is_in_flight()" deroute="landed"/>
+      <exception cond="!InsideLAND(GetPosX(), GetPosY())" deroute="land"/>
+      <call fun="NavStartDetectGround()"/>
+      <stay climb="-0.2" vmode="climb" wp="CAM"/>
+      <deroute block="landed"/>
+    </block>
+    <block name="flare">
+      <exception cond="NavDetectGround()" deroute="holding_point"/>
+      <exception cond="!nav_is_in_flight()" deroute="landed"/>
+      <call fun="NavStartDetectGround()"/>
+      <stay climb="nav_descend_vspeed" vmode="climb" wp="TD"/>
+      <deroute block="landed"/>
+    </block>
+    <block name="landed" strip_button="Kill" strip_icon="kill.png" group="landing">
+      <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
+    </block>
+    <block name="landed_emergency">
+      <attitude pitch="0" roll="0" throttle="0" until="FALSE" vmode="throttle"/>
+    </block>
+  </blocks>
+
+</procedure>
