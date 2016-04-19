@@ -6,13 +6,13 @@
     <waypoint name="CLIMB" x="-7.6" y="15.4"/>
     <waypoint name="STDBY" x="-3.7" y="24.0"/>
     <waypoint lat="52.124530" lon="4.467599" name="TD"/>
-    <waypoint lat="52.124464" lon="4.467629" name="_green1A"/>
-    <waypoint lat="52.124464" lon="4.467629" name="_green1B"/>
-    <waypoint lat="52.124464" lon="4.467629" name="_green1C"/>
-    <waypoint lat="52.124464" lon="4.467629" name="CAM"/>
-    <waypoint lat="52.124464" lon="4.467629" name="_green1D"/>
-    <waypoint lat="52.124464" lon="4.467629" name="_green1E"/>
-    <waypoint lat="52.124464" lon="4.467629" name="_green1F"/>
+    <waypoint lat="52.124393" lon="4.467426" name="_green1A"/>
+    <waypoint lat="52.124457" lon="4.467169" name="_green1B"/>
+    <waypoint lat="52.124539" lon="4.467242" name="_green1C"/>
+    <waypoint lat="52.124476" lon="4.467434" name="CAM"/>
+    <waypoint lat="52.124546" lon="4.467798" name="_green1D"/>
+    <waypoint lat="52.124471" lon="4.468054" name="_green1E"/>
+    <waypoint lat="52.124365" lon="4.468062" name="_green1F"/>
     <waypoint lat="52.124466" lon="4.468372" name="_red1"/>
     <waypoint lat="52.124375" lon="4.468550" name="_red2"/>
     <waypoint lat="52.124259" lon="4.468449" name="_red3"/>

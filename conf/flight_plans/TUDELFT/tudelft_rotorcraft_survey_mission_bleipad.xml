@@ -5,6 +5,7 @@
   <header>
 #include "autopilot.h"
 #include "subsystems/electrical.h"
+#include "modules/nav/nav_survey_poly_rotorcraft.h"
 #ifdef dc_Survey
 #define LINE_START_FUNCTION dc_Survey(dc_distance_interval);
 #define LINE_STOP_FUNCTION {dc_autoshoot = DC_AUTOSHOOT_STOP;}
@@ -27,7 +28,7 @@
   <exceptions>
       <exception cond="electrical.bat_low && (exception_flag[0] == 0)" deroute="Standby" exec="set_exception_flag(0)"/>
       <exception cond="electrical.bat_critical && (exception_flag[1] == 0)" deroute="land_here" exec="set_exception_flag(1)"/>
-    <exception cond="(!InsideRED(GetPosX(), GetPosY()) && !(nav_block == IndexOfBlock('flare')) && !(nav_block == IndexOfBlock('landed')) && !(nav_block == IndexOfBlock('WaitGPS')) && !(nav_block == IndexOfBlock('GeoInit')))" deroute="land_emergency"/>
+    <exception cond="(!InsideRED(GetPosX(), GetPosY()) && !(nav_block == IndexOfBlock('flare')) && !(nav_block == IndexOfBlock('landed')) && !(nav_block == IndexOfBlock('WaitGPS')) && !(nav_block == IndexOfBlock('GeoInit')))" deroute="land_here"/>
   </exceptions>
 
   <blocks>
@@ -88,7 +89,7 @@
     </block>
 -->
     <block group="survey" name="SurveyPoly" strip_button="Survey-Polygon-S1-S2-S3-S4" strip_icon="googleearth.png">
-      <call fun="nav_survey_poly_setup_towards(WP_S1, 4, sweep, WP_S2)"/>
+      <call fun="nav_survey_poly_setup_towards(WP__green1D, 4, sweep, WP__green1E)"/>
       <deroute block="Survey Poly RUN"/>
     </block>
     <block name="Survey Poly RUN">
@@ -110,7 +111,6 @@
     <block name="visual_flare" strip_button="VisualLanding-CAM" strip_icon="cam_lock.png" group="landing">
       <exception cond="NavDetectGround()" deroute="holding_point"/>
       <exception cond="!nav_is_in_flight()" deroute="landed"/>
-      <exception cond="!InsideLAND(GetPosX(), GetPosY())" deroute="land"/>
       <call fun="NavStartDetectGround()"/>
       <stay climb="-0.2" vmode="climb" wp="CAM"/>
       <deroute block="landed"/>
