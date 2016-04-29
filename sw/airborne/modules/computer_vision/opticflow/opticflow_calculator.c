@@ -224,7 +224,6 @@ void calc_fast9_lukas_kanade(struct opticflow_t *opticflow, struct opticflow_sta
       opticflow->fast9_threshold++;
     }
   }
-
 #if OPTICFLOW_DEBUG && OPTICFLOW_SHOW_CORNERS
   image_show_points(img, corners, result->corner_cnt);
 #endif
