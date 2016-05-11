@@ -66,6 +66,26 @@
 
   <section name="sessions">
 
+   <session name="AAPocketdrone">
+      <program name="Server"/>
+      <program name="GCS"/>
+      <program name="BluegigaUsbDongle">
+        <arg flag="/dev/ttyACM2"/>
+        <arg flag="00:07:80:2d:d6:d7" />
+        <arg flag="4242" />
+        <arg flag="4252" />
+      </program>
+      <program name="Data Link">
+        <arg flag="-udp -udp_port 4242 -udp_uplink_port 4252"/>
+      </program>
+ <program name="NatNet">
+	  <arg flag="-ac 88 164" />
+</program>
+     
+ <program name="NatNet">
+	  <arg flag="-ac 89 202" />
+</program>
+    </session>
    <session name="Flight UDP/WiFi">
       <program name="Server"/>
       <program name="GCS"/>

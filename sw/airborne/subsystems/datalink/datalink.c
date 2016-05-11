@@ -30,7 +30,7 @@
 
 #include "datalink.h"
 #include "subsystems/datalink/downlink.h"
-
+#include "modules/look_at_me/look_at_me.h"
 #include "generated/modules.h"
 #include "generated/settings.h"
 
@@ -139,7 +139,6 @@ void dl_parse_msg(void)
     }
     return;  // msg was telemetry not datalink so return
   }
-
   /* parse telemetry messages coming from ground station */
   switch (msg_id) {
     case  DL_PING: {
@@ -155,7 +154,14 @@ void dl_parse_msg(void)
       DOWNLINK_SEND_DL_VALUE(DefaultChannel, DefaultDevice, &i, &var);
     }
     break;
-
+    case DL_SOMETHING_DATALINK: {
+#ifdef LOOK_AT_LOCATION
+#warning "WOW, locaiton stuff"
+    	set_location_to_look_at(DL_SOMETHING_DATALINK_hier(dl_buffer),DL_SOMETHING_DATALINK_daar(dl_buffer),DL_SOMETHING_DATALINK_z(dl_buffer));
+#endif
+//    	printf("Received waypoint look at %d %d\n",DL_SOMETHING_DATALINK_hier(dl_buffer),DL_SOMETHING_DATALINK_daar(dl_buffer));
+    }
+    break;
     case DL_GET_SETTING : {
       if (DL_GET_SETTING_ac_id(dl_buffer) != AC_ID) { break; }
       uint8_t i = DL_GET_SETTING_index(dl_buffer);

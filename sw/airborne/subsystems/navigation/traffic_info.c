@@ -53,6 +53,7 @@ struct ac_info_ *get_ac_info(uint8_t _id)
 void set_ac_info(uint8_t id, float utm_east, float utm_north, float course, float alt,
                  float gspeed, float climb, uint32_t itow)
 {
+	printf("Setting ac info\n");
   if (acs_idx < NB_ACS) {
     if (id > 0 && the_acs_id[id] == 0) {
       the_acs_id[id] = acs_idx++;

@@ -57,12 +57,12 @@
   <aircraft
    name="LadyLisa"
    ac_id="164"
-   airframe="airframes/examples/ladybird_lisa_s.xml"
+   airframe="airframes/BR/ladybird_kit_bart_bluegiga_optitrack.xml"
    radio="radios/cockpitSX.xml"
    telemetry="telemetry/default_rotorcraft.xml"
    flight_plan="flight_plans/rotorcraft_basic.xml"
-   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/superbitrf.xml settings/nps.xml"
-   settings_modules="modules/gps_ubx_ucenter.xml"
+   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int.xml settings/nps.xml"
+   settings_modules=""
    gui_color="white"
   />
   <aircraft
@@ -226,7 +226,7 @@
    radio="radios/dummy.xml"
    telemetry="telemetry/default_rotorcraft.xml"
    flight_plan="flight_plans/rotorcraft_basic.xml"
-   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/estimation/ahrs_float_mlkf.xml settings/control/stabilization_att_int_quat.xml settings/nps.xml"
+   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/nps.xml settings/estimation/ahrs_int_cmpl_quat.xml"
    settings_modules="modules/geo_mag.xml modules/air_data.xml modules/video_thread.xml modules/video_rtp_stream.xml"
    gui_color="red"
   />
@@ -240,6 +240,17 @@
    settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_indi.xml settings/control/rotorcraft_speed.xml"
    settings_modules="[modules/geo_mag.xml] modules/air_data.xml modules/gps_ubx_ucenter.xml"
    gui_color="red"
+  />
+  <aircraft
+   name="bebop_v2"
+   ac_id="1"
+   airframe="airframes/examples/bebop.xml"
+   radio="radios/dummy.xml"
+   telemetry="telemetry/default_rotorcraft.xml"
+   flight_plan="flight_plans/rotorcraft_basic.xml"
+   settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/estimation/ahrs_float_mlkf.xml settings/control/stabilization_att_int_quat.xml settings/nps.xml"
+   settings_modules="modules/geo_mag.xml modules/air_data.xml modules/video_thread.xml modules/video_rtp_stream.xml"
+   gui_color="#ea4d02fbf10b"
   />
   <aircraft
    name="krooz_quad"

@@ -11,31 +11,48 @@
     </target>
 
     <!--define name="USE_SONAR" value="TRUE"/-->
-
+ <define name="USE_GPS_ALT" value="1"/>
+ <define name="USE_GPS_HEADING" value="1"/>
+ <define name="AHRS_USE_GPS_HEADING" value="1"/>
+ <define name="USE_MAGNETOMETER" value="0"/>
 	<!-- Subsystem section -->
     <module name="telemetry" type="transparent_udp"/>
-    <module name="radio_control" type="datalink"/>
+    <module name="radio_control" type="datalink">
+	<define name="LOOK_AT_LOCATION" value="1"/>    
+</module>
     <module name="motor_mixing"/>
     <module name="actuators" type="bebop"/>
     <module name="imu" type="bebop"/>
-    <module name="gps" type="furuno"/>
+    <module name="gps" type="datalink"/>
     <module name="stabilization" type="int_quat"/>
-    <module name="ahrs"          type="float_mlkf"/>
+    <module name="ahrs"          type="int_cmpl_quat">
+      <configure name="USE_MAGNETOMETER" value="FALSE"/>
+      <define name="AHRS_USE_GPS_HEADING" value="TRUE"/>
+    </module>
+ <module name="follow">
+	<define name="FOLLOW_WAYPOINT_ID" value="WP_p1"/>
+        <define name="FOLLOW_AC_ID" value="164"/>
+    </module>
+
     <module name="ins" type="extended"/>
   </firmware>
 
   <modules main_freq="512">
     <module name="geo_mag"/>
     <module name="air_data"/>
+   
     <module name="send_imu_mag_current"/>
     <!--module name="logger_file">
       <define name="FILE_LOGGER_PATH" value="/data/ftp/internal_000"/>
     </module-->
+
     <module name="video_thread">
       <define name="VIDEO_THREAD_FPS" value="4"/>
-      <define name="VIDEO_THREAD_CAMERA" value="bottom_camera"/>
+      <define name="VIDEO_THREAD_CAMERA" value="front_camera"/>
       <define name="VIDEO_THREAD_SHOT_PATH" value="/data/ftp/internal_000/images"/>
     </module>
+
+    <module name="look_at_me"/>
     <module name="video_rtp_stream">
       <define name="VIEWVIDEO_QUALITY_FACTOR" value="80"/>
       <define name="VIEWVIDEO_DOWNSIZE_FACTOR" value="1"/>

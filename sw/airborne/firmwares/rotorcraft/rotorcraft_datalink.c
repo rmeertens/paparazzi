@@ -38,6 +38,7 @@
 
 void firmware_parse_msg(void)
 {
+#warning "COMPILING ROTORCRAFT PARSE MSG"
   uint8_t msg_id = IdOfPprzMsg(dl_buffer);
 
   /* parse telemetry messages coming from ground station */

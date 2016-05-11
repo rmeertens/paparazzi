@@ -1,0 +1,16 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="look_at_me">
+  <doc>
+    <description>looks at me</description>
+  </doc>
+  <header>
+    <file name="look_at_me.h"/>
+  </header>
+  <init fun="look_at_me_init()"/>
+  <event fun="look_at_me_periodic()"/>
+  <makefile>
+    <file name="look_at_me.c"/>
+  </makefile>
+</module>
+

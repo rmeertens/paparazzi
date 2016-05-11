@@ -97,7 +97,7 @@ PRINT_CONFIG_VAR(AHRS_MAG_ZETA)
  * Don't update heading from GPS course if GPS ground speed is below is this threshold
  */
 #ifndef AHRS_HEADING_UPDATE_GPS_MIN_SPEED
-#define AHRS_HEADING_UPDATE_GPS_MIN_SPEED 5.0
+#define AHRS_HEADING_UPDATE_GPS_MIN_SPEED 0.0
 #endif
 
 struct AhrsIntCmplQuat ahrs_icq;
@@ -528,7 +528,6 @@ void ahrs_icq_update_gps(struct GpsState *gps_s __attribute__((unused)))
   static const uint16_t gps_min_speed = AHRS_HEADING_UPDATE_GPS_MIN_SPEED * 100;
   static const uint32_t max_cacc = RadOfDeg(10 * 1e7);
   if (gps_s->fix >= GPS_FIX_3D &&
-      gps_s->gspeed >= gps_min_speed &&
       gps_s->cacc <= max_cacc) {
 
     // gps_s->course is in rad * 1e7, we need it in rad * 2^INT32_ANGLE_FRAC
@@ -536,12 +535,12 @@ void ahrs_icq_update_gps(struct GpsState *gps_s __attribute__((unused)))
 
     /* the assumption here is that there is no side-slip, so heading=course */
 
-    if (ahrs_icq.heading_aligned) {
-      ahrs_icq_update_heading(course);
-    } else {
+   // if (ahrs_icq.heading_aligned) {
+     // ahrs_icq_update_heading(course);
+    //} else {
       /* hard reset the heading if this is the first measurement */
       ahrs_icq_realign_heading(course);
-    }
+   // }
   }
 #endif
 }
