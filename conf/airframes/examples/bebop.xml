@@ -18,9 +18,12 @@
     <module name="motor_mixing"/>
     <module name="actuators" type="bebop"/>
     <module name="imu" type="bebop"/>
-    <module name="gps" type="furuno"/>
-    <module name="stabilization" type="int_quat"/>
-    <module name="ahrs"          type="float_mlkf"/>
+    <module name="gps" type="datalink"/>
+    <module name="stabilization" type="int_quat"/> 
+ <module name="ahrs" type="int_cmpl_quat">
+      <configure name="USE_MAGNETOMETER" value="FALSE"/>
+      <define name="AHRS_USE_GPS_HEADING" value="TRUE"/>
+</module>
     <module name="ins" type="extended"/>
   </firmware>
 
@@ -159,7 +162,7 @@
     <define name="HOVER_KP" value="283"/>
     <define name="HOVER_KD" value="82"/>
     <define name="HOVER_KI" value="13"/>
-    <define name="NOMINAL_HOVER_THROTTLE" value="0.655"/>
+    <define name="NOMINAL_HOVER_THROTTLE" value="0.525"/>
     <define name="ADAPT_THROTTLE_ENABLED" value="TRUE"/>
   </section>
 
