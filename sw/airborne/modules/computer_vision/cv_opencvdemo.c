@@ -44,32 +44,6 @@ int opencv_func(struct image_t* img)
   return FALSE;
 }
 
-
-/**
- * Increases the NAV heading. Assumes heading is an INT32_ANGLE. It is bound in this function.
- */
-uint8_t increase_nav_heading(int32_t *heading, int32_t increment)
-{
-  *heading = *heading + increment;
-  // Check if your turn made it go out of bounds...
-  INT32_ANGLE_NORMALIZE(*heading); // HEADING HAS INT32_ANGLE_FRAC....
-  return false;
-}
-
-
-/*
-bool nav_set_heading_rad(float rad)
-{
-  nav_heading = ANGLE_BFP_OF_REAL(rad);
-  INT32_COURSE_NORMALIZE(nav_heading);
-  return false;
-}
-
-bool nav_set_heading_deg(float deg)
-{
-  return nav_set_heading_rad(RadOfDeg(deg));
-}*/
-
 float currentHeadingRad=0.0;
 int previousCounter=0;
 void opencvdemo_periodic(void)
@@ -78,10 +52,10 @@ void opencvdemo_periodic(void)
 	  //printf("Tracking now? %d at point %d %d\n",selfie_var.trackingNow,selfie_var.trackingX,selfie_var.trackingY);
 	  if(selfie_var.trackingNow && selfie_var.trackingNumber!=previousCounter){
 		  if(selfie_var.trackingPercentageX<0.5){
-			  currentHeadingRad+=0.1;
+			  currentHeadingRad-=0.1;
 		  }
 		  else{
-			  currentHeadingRad-=0.1;
+			  currentHeadingRad+=0.1;
 		  }
 		  nav_set_heading_rad(currentHeadingRad);
 	  }
@@ -94,11 +68,11 @@ void opencvdemo_periodic(void)
 
 void received_start_selfie(){
 	printf("Whooo. starting selfie shizzle!\n");
-	int x = DL_START_SELFIE_startx(dl_buffer);
-	int y = DL_START_SELFIE_starty(dl_buffer);
-	int width = DL_START_SELFIE_width(dl_buffer);
-	int height = DL_START_SELFIE_height(dl_buffer);
-	int downsized_width = DL_START_SELFIE_downsized_width(dl_buffer);
+	int x = DL_VIDEO_SELECTED_startx(dl_buffer);
+	int y = DL_VIDEO_SELECTED_starty(dl_buffer);
+	int width = DL_VIDEO_SELECTED_width(dl_buffer);
+	int height = DL_VIDEO_SELECTED_height(dl_buffer);
+	int downsized_width = DL_VIDEO_SELECTED_downsized_width(dl_buffer);
 
 	selfie_var.must_init=true;
 	selfie_var.startx=x;
@@ -112,6 +86,7 @@ void received_start_selfie(){
 	selfie_var.trackingPercentageX=0.0;
 
 }
+
 void opencvdemo_init(void)
 {
 
