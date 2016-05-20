@@ -38,33 +38,28 @@ def onmouse(event, x, y, flags, param):
         x, y = np.int16([x, y]) # BUG
         # print("On mouse")
         if event == cv2.EVENT_LBUTTONDOWN:
-            drag_start = (x, y)
-            tracking_state = 0
-            return
-        if drag_start:
-             if flags & cv2.EVENT_FLAG_LBUTTON:
-                 h, w = frame.shape[:2]
-                 xo, yo = drag_start
-                 x0, y0 = np.maximum(0, np.minimum([xo, yo], [x, y]))
-                 x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
-                 selection = None
-                 print("Mouse dragging!")
-                 if x1-x0 > 0 and y1-y0 > 0:
-                     selection = (x0, y0, x1, y1)
-             else:
-                 print("Mouse up again")
-                 drag_start = None
-                 if selection is not None:
-                     tracking_state = 1
-                     msg2 = PprzMessage("datalink", "VIDEO_SELECTED")
-                     msg2['startx'] = selection[0]
-                     msg2['starty'] = selection[1]
-                     msg2['width'] = selection[2]-selection[0]
-                     msg2['height'] = selection[3]-selection[1]
-                     msg2['downsized_width'] = frame.shape[0]
-
-                     print("Sending message: %s" % msg2)
-                     interface.send(msg2,202)
+         #    if flags & cv2.EVENT_FLAG_LBUTTON:
+         #        h, w = frame.shape[:2]
+         #        xo, yo = drag_start
+         #        x0, y0 = np.maximum(0, np.minimum([xo, yo], [x, y]))
+         #        x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
+         #        selection = None
+         #        print("Mouse dragging!")
+         #        if x1-x0 > 0 and y1-y0 > 0:
+         #            selection = (x0, y0, x1, y1)
+         #    else:
+         #        print("Mouse up again")
+         #        drag_start = None
+         #        if selection is not None:
+         #            tracking_state = 1
+           msg2 = PprzMessage("datalink", "VIDEO_SELECTED")
+           msg2['startx'] = x
+           msg2['starty'] = y
+           msg2['width'] = 10#selection[2]-selection[0]
+           msg2['height'] = 10#selection[3]-selection[1]
+           msg2['downsized_width'] = frame.shape[0]
+           print("Sending message: %s" % msg2)
+           interface.send(msg2,202)
 
 cv2.setMouseCallback('imageframe', onmouse)
 
