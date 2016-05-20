@@ -255,7 +255,7 @@ int opencv_example(char *img, int width, int height)
 //   }
 //
 
-//    convertBackFromGrayscale( gray,  img, width, height);
+    convertBackFromGrayscale( gray,  img, width, height);
 
     //convertBackFromRGB( image,  img, width, height);
      return 0;
