@@ -26,6 +26,22 @@
 #ifndef CV_OPENCVDEMO_H
 #define CV_OPENCVDEMO_H
 
+struct selfie_init{
+	bool must_init;
+	int startx;
+	int starty;
+	int width;
+	int height;
+	int downsized_width;
+
+	bool trackingNow;
+	int trackingNumber;
+	float trackingPercentageX;
+	float trackingPercentageY;
+};
+
+struct selfie_init selfie_var;
+extern void received_start_selfie(void);
 extern void opencvdemo_init(void);
 
 #endif

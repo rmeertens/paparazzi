@@ -12,6 +12,8 @@
     <file name="cv_opencvdemo.h"/>
   </header>
   <init fun="opencvdemo_init()"/>
+  <periodic fun="opencvdemo_periodic()"/>
+ <datalink message="VIDEO_SELECTED" fun="received_start_selfie()"/>
   <makefile>
     <file name="cv_opencvdemo.c"/>
     <file name="opencv_example.cpp"/>
@@ -20,6 +22,7 @@
 
   	<flag name="LDFLAGS" value="L$(PAPARAZZI_SRC)/sw/ext/opencv_bebop/install/lib" />
 	<flag name="LDFLAGS" value="lopencv_imgcodecs" />
+	<flag name="LDFLAGS" value="lopencv_video" />
 	<flag name="LDFLAGS" value="lopencv_imgproc" />
 	<flag name="LDFLAGS" value="lopencv_core" />
 	<flag name="LDFLAGS" value="L$(PAPARAZZI_HOME)/sw/ext/opencv_bebop/install/share/OpenCV/3rdparty/lib" />
