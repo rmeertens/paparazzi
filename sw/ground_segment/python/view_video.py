@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-
 import sys
 from os import path, getenv
 import numpy as np
@@ -10,7 +9,7 @@ import sys
 import time
 import threading
 from os import path, getenv
-# from flask import Flask
+import argparse
 # # if PAPARAZZI_SRC not set, then assume the tree containing this
 # # file is a reasonable substitute
 PPRZ_SRC = getenv("PAPARAZZI_SRC", path.normpath(path.join(path.dirname(path.abspath(__file__)), '../../../../')))
@@ -23,6 +22,12 @@ from pprzlink.message import PprzMessage
 def message_recv(ac_id, msg):
     print("Received message")
 
+parser = argparse.ArgumentParser(description='Select the aircraft ID to which you want to send the selected ROI')
+parser.add_argument('-ac', type=int, help='Aircraft ID for the ROI')
+args = parser.parse_args()
+if not args.ac:
+	print('Please submit an aircraft id with -ac X')
+print(args.ac)
 interface = IvyMessagesInterface("VideoOpencvViewer")
 cap = cv2.VideoCapture('rtp:0.0.0.0:5000')
 cv2.namedWindow('imageframe')
@@ -56,7 +61,7 @@ def onmouse(event, x, y, flags, param):
                  drag_start = None
                  if selection is not None:
                      tracking_state = 1
-                     msg2 = PprzMessage("datalink", "VIDEO_SELECTED")
+                     msg2 = PprzMessage("datalink", "VIDEO_ROI")
                      msg2['startx'] = selection[0]
                      msg2['starty'] = selection[1]
                      msg2['width'] = selection[2]-selection[0]
