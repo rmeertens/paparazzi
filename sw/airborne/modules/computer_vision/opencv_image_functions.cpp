@@ -1,14 +1,14 @@
 /*
- * Copyright (C) C. De Wagter
+ * Copyright (C) 2016 Roland Meertens
  *
- * This file is part of paparazzi
+ * This file is part of Paparazzi.
  *
- * paparazzi is free software; you can redistribute it and/or modify
+ * Paparazzi is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * paparazzi is distributed in the hope that it will be useful,
+ * Paparazzi is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -16,23 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with paparazzi; see the file COPYING.  If not, see
  * <http://www.gnu.org/licenses/>.
+ *
  */
+
 /**
- * @file "modules/computer_vision/opencv_example.cpp"
- * @author C. De Wagter
- * A simple module showing what you can do with opencv on the bebop.
+ * @file modules/computer_vision/opencv_image_functions.cpp
+ *
+ * A small library with functions to convert between the Paparazzi used YUV422 arrays
+ * and the opencv image functions.
  */
 
-
-#include "opencv_example.h"
-
+#include "opencv_image_functions.h"
 
 
 using namespace std;
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
-#include "opencv_image_functions.h"
 
 void color_opencv_to_yuv422(Mat image, char *img, int width, int height)
 {
@@ -61,26 +61,4 @@ void grayscale_opencv_to_yuv422(Mat image, char *img, int width, int height)
       img[(row * width + col) * 2 ] = 127;
     }
   }
-}
-
-int opencv_example(char *img, int width, int height)
-{
-  // Create a new image, using the original bebop image.
-  Mat M(width, height, CV_8UC2, img);
-  Mat image;
-  // If you want a color image, uncomment this line
-  // cvtColor(M, image, CV_YUV2RGB_Y422);
-  // For a grayscale image, use this one
-  cvtColor(M, image, CV_YUV2GRAY_Y422);
-
-  // Blur it, because we can
-  blur(image, image, Size(5, 5));
-
-  // Canny edges, only works with grayscale image
-  int edgeThresh = 35;
-  Canny(image, image, edgeThresh, edgeThresh * 3);
-
-  // Convert back to YUV422, and put it in place of the original image
-  grayscale_opencv_to_yuv422(image, img, width, height);
-  return 0;
 }
