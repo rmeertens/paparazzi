@@ -66,7 +66,7 @@ void grayscale_opencv_to_yuv422(Mat image, char *img, int width, int height)
 int opencv_example(char *img, int width, int height)
 {
   // Create a new image, using the original bebop image.
-  Mat M(width, height, CV_8UC2, img);
+  Mat M(height, width, CV_8UC2, img);
   Mat image;
   // If you want a color image, uncomment this line
   // cvtColor(M, image, CV_YUV2RGB_Y422);
