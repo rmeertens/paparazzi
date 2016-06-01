@@ -105,7 +105,7 @@ class Guidance(object):
         """
         msg = PprzMessage("datalink", "GUIDED_SETPOINT_NED")
         msg['ac_id'] = self.ac_id
-        msg['flags'] = 0x03
+        msg['flags'] = 0x02
         msg['x'] = forward
         msg['y'] = right
         msg['z'] = down
@@ -113,18 +113,32 @@ class Guidance(object):
         print("goto body relative: %s" % msg)
         self._interface.send_raw_datalink(msg)
 
-    def move_at_vel(self, north=0.0, east=0.0, down=0.0, yaw=0.0):
+    def move_at_ned_vel(self, north=0.0, east=0.0, down=0.0, yaw=0.0):
         """
         move at specified velocity in meters/sec with absolute heading (if already in GUIDED mode)
         """
         msg = PprzMessage("datalink", "GUIDED_SETPOINT_NED")
         msg['ac_id'] = self.ac_id
-        msg['flags'] = 0x70
+        msg['flags'] = 0x60
         msg['x'] = north
         msg['y'] = east
         msg['z'] = down
         msg['yaw'] = yaw
         print("move at vel NED: %s" % msg)
+        self._interface.send_raw_datalink(msg)
+        
+        def move_at_body_vel(self, forward=0.0, right=0.0, down=0.0, yaw=0.0):
+        """
+        move at specified velocity in meters/sec with absolute heading (if already in GUIDED mode)
+        """
+        msg = PprzMessage("datalink", "GUIDED_SETPOINT_NED")
+        msg['ac_id'] = self.ac_id
+        msg['flags'] = 0x62
+        msg['x'] = north
+        msg['y'] = east
+        msg['z'] = down
+        msg['yaw'] = yaw
+        print("move at vel body: %s" % msg)
         self._interface.send_raw_datalink(msg)
 
 
