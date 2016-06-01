@@ -576,8 +576,7 @@ bool autopilot_guided_move_ned(float vx, float vy, float vz, float heading)
 }
 
 /* Note: Offset position command in NED frame or body frame will only be implemented if
- * local reference frame has been initialised. Additionally, if both the offset NED
- * and offset body flags are set, the x,y setting is not implemented.
+ * local reference frame has been initialised.
  * Flag definition:
    bit 0: x,y as offset coordinates
    bit 1: x,y in body coordinates
@@ -604,17 +603,17 @@ void autopilot_guided_update(uint8_t flags, float x, float y, float z, float yaw
     }
     guidance_h_set_guided_vel(x, y);
   } else {  // position setpoint
-    if ((flags & 3) == 0) {   // set absolute position setpoint
+    if (!bit_is_set(0) && !bit_is_set(1)) {   // set absolute position setpoint
       guidance_h_set_guided_pos(x, y);
-    } else {    // note: if both bit 0 and 1 are set nothing is done!
+    } else {
       if (stateIsLocalCoordinateValid()) {
-        if (!bit_is_set(flags, 1) && bit_is_set(flags, 0)) { // set position as offset in NED frame
-          x += stateGetPositionNed_f()->x;
-          y += stateGetPositionNed_f()->y;
-        } else if (bit_is_set(flags, 1) && !bit_is_set(flags, 0)) {  // set position as offset in body frame
+        if (bit_is_set(flags, 1)) {  // set position as offset in body frame
           float psi = stateGetNedToBodyEulers_f()->psi;
           x = stateGetPositionNed_f()->x + cosf(-psi) * x + sinf(-psi) * y;
           y = stateGetPositionNed_f()->y - sinf(-psi) * x + cosf(-psi) * y;
+        } else {                     // set position as offset in NED frame
+          x += stateGetPositionNed_f()->x;
+          y += stateGetPositionNed_f()->y;
         }
         guidance_h_set_guided_pos(x, y);
       }
