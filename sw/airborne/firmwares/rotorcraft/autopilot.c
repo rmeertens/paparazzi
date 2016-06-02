@@ -603,7 +603,7 @@ void autopilot_guided_update(uint8_t flags, float x, float y, float z, float yaw
     }
     guidance_h_set_guided_vel(x, y);
   } else {  // position setpoint
-    if (!bit_is_set(0) && !bit_is_set(1)) {   // set absolute position setpoint
+    if (!bit_is_set(flags, 0) && !bit_is_set(flags, 1)) {   // set absolute position setpoint
       guidance_h_set_guided_pos(x, y);
     } else {
       if (stateIsLocalCoordinateValid()) {

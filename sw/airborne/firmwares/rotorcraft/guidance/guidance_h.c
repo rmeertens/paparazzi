@@ -250,6 +250,7 @@ void guidance_h_mode_changed(uint8_t new_mode)
       break;
 
     case GUIDANCE_H_MODE_HOVER:
+    case GUIDANCE_H_MODE_GUIDED:
 #if GUIDANCE_INDI
       guidance_indi_enter();
 #endif
