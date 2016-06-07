@@ -34,10 +34,14 @@
 
     <module name="video_thread">
     </module>
-<!--
+
+    <module name="video_usb_logger">
+	<define name="VIDEO_USB_LOGGER_PATH" value="/data/ftp/internal_000"/>
+    </module>
+
     <module name="video_rtp_stream">
-        <define name="VIEWVIDEO_CAMERA" value="VIDEO1"/>
-    </module>-->
+        <define name="VIEWVIDEO_CAMERA" value="front_camera"/>
+    </module>
 
   </modules>
 
