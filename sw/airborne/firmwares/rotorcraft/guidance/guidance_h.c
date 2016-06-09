@@ -251,6 +251,7 @@ void guidance_h_mode_changed(uint8_t new_mode)
 
     case GUIDANCE_H_MODE_HOVER:
     case GUIDANCE_H_MODE_GUIDED:
+      guidance_h_set_guided_pos(stateGetPositionNed_f()->x, stateGetPositionNed_f()->y);
 #if GUIDANCE_INDI
       guidance_indi_enter();
 #endif
