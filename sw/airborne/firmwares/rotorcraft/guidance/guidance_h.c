@@ -251,7 +251,6 @@ void guidance_h_mode_changed(uint8_t new_mode)
 
     case GUIDANCE_H_MODE_HOVER:
     case GUIDANCE_H_MODE_GUIDED:
-      guidance_h_set_guided_pos(stateGetPositionNed_f()->x, stateGetPositionNed_f()->y);
 #if GUIDANCE_INDI
       guidance_indi_enter();
 #endif
@@ -328,7 +327,6 @@ void guidance_h_read_rc(bool  in_flight)
 #if GUIDANCE_H_USE_SPEED_REF
       read_rc_setpoint_speed_i(&guidance_h.sp.speed, in_flight);
       /* enable x,y velocity setpoints */
-      SetBit(guidance_h.sp.mask, 4);
       SetBit(guidance_h.sp.mask, 5);
 #endif
       break;
@@ -459,7 +457,7 @@ static void guidance_h_update_reference(void)
 {
   /* compute reference even if usage temporarily disabled via guidance_h_use_ref */
 #if GUIDANCE_H_USE_REF
-  if (bit_is_set(guidance_h.sp.mask, 4) && bit_is_set(guidance_h.sp.mask, 5)) {
+  if (bit_is_set(guidance_h.sp.mask, 5)) {
     gh_update_ref_from_speed_sp(guidance_h.sp.speed);
   } else {
     gh_update_ref_from_pos_sp(guidance_h.sp.pos);
@@ -578,22 +576,25 @@ static void guidance_h_hover_enter(void)
   /* disable horizontal velocity setpoints,
    * might still be activated in guidance_h_read_rc if GUIDANCE_H_USE_SPEED_REF
    */
-  ClearBit(guidance_h.sp.mask, 4);
   ClearBit(guidance_h.sp.mask, 5);
   ClearBit(guidance_h.sp.mask, 7);
 
   /* set horizontal setpoint to current position */
   VECT2_COPY(guidance_h.sp.pos, *stateGetPositionNed_i());
 
+  /* reset guidance reference */
   reset_guidance_reference_from_current_position();
 
+  /* set guidance to current heading and position */
   guidance_h.rc_sp.psi = stateGetNedToBodyEulers_i()->psi;
   guidance_h.sp.heading = guidance_h.rc_sp.psi;
+
+  /* reset speed setting */
+  guidance_h_set_guided_vel(0., 0.);
 }
 
 static void guidance_h_nav_enter(void)
 {
-  ClearBit(guidance_h.sp.mask, 4);
   ClearBit(guidance_h.sp.mask, 5);
   ClearBit(guidance_h.sp.mask, 7);
 
@@ -657,7 +658,6 @@ void guidance_h_set_igain(uint32_t igain)
 bool guidance_h_set_guided_pos(float x, float y)
 {
   if (guidance_h.mode == GUIDANCE_H_MODE_GUIDED) {
-    ClearBit(guidance_h.sp.mask, 4);
     ClearBit(guidance_h.sp.mask, 5);
     guidance_h.sp.pos.x = POS_BFP_OF_REAL(x);
     guidance_h.sp.pos.y = POS_BFP_OF_REAL(y);
@@ -680,7 +680,6 @@ bool guidance_h_set_guided_heading(float heading)
 bool guidance_h_set_guided_vel(float vx, float vy)
 {
   if (guidance_h.mode == GUIDANCE_H_MODE_GUIDED) {
-    SetBit(guidance_h.sp.mask, 4);
     SetBit(guidance_h.sp.mask, 5);
     guidance_h.sp.speed.x = SPEED_BFP_OF_REAL(vx);
     guidance_h.sp.speed.y = SPEED_BFP_OF_REAL(vy);

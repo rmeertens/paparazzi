@@ -20,13 +20,16 @@
  */
 
 /**
- * @file modules/computer_vision/video_device.h
+ * @file peripherals/video_device.h
  */
 
 #ifndef VIDEO_DEVICE_H
 #define VIDEO_DEVICE_H
+
 #include <stdbool.h>
 #include <inttypes.h>
+#include "modules/computer_vision/lib/vision/image.h"
+
 #define VIDEO_FILTER_DEBAYER 0x01
 
 typedef struct image_t *(*cvFunction)(struct image_t *img);
