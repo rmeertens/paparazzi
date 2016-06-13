@@ -510,7 +510,8 @@ static void vel_est_cb(uint8_t sender_id __attribute__((unused)),
                        float x, float y, float z,
                        float noise __attribute__((unused)))
 {
-
+	x = 10*x;
+	y=10*y;
   struct FloatVect3 vel_body = {x, y, z};
   static uint32_t last_stamp = 0;
   float dt = 0;
@@ -527,22 +528,25 @@ static void vel_est_cb(uint8_t sender_id __attribute__((unused)),
 
   last_stamp = stamp;
 
-#if USE_HFF
-  (void)dt; //dt is unused variable in this define
-
-  struct FloatVect2 vel = {vel_ned.x, vel_ned.y};
-  struct FloatVect2 Rvel = {noise, noise};
-
-  b2_hff_update_vel(vel,  Rvel);
-  ins_update_from_hff();
-#else
+//#if USE_HFF
+//  (void)dt; //dt is unused variable in this define
+//
+//  struct FloatVect2 vel = {vel_ned.x, vel_ned.y};
+//  struct FloatVect2 Rvel = {noise, noise};
+//
+//  b2_hff_update_vel(vel,  Rvel);
+//  ins_update_from_hff();
+//#else
   ins_int.ltp_speed.x = SPEED_BFP_OF_REAL(vel_ned.x);
   ins_int.ltp_speed.y = SPEED_BFP_OF_REAL(vel_ned.y);
-  if (last_stamp > 0) {
-    ins_int.ltp_pos.x = ins_int.ltp_pos.x + POS_BFP_OF_REAL(dt * vel_ned.x);
-    ins_int.ltp_pos.y = ins_int.ltp_pos.y + POS_BFP_OF_REAL(dt * vel_ned.y);
-  }
-#endif
+//  if (last_stamp > 0) {
+  int deltaposx = POS_BFP_OF_REAL(dt * vel_ned.x);
+  int deltaposy= POS_BFP_OF_REAL(dt * vel_ned.y);
+  printf("Delta pos x: %d float: %f delta pos y: %d float: %f\n",deltaposx,vel_ned.x,deltaposy,vel_ned.y);
+    ins_int.ltp_pos.x = ins_int.ltp_pos.x + deltaposx;
+    ins_int.ltp_pos.y = ins_int.ltp_pos.y + deltaposy;
+//  }
+//#endif
 
   ins_ned_to_state();
 

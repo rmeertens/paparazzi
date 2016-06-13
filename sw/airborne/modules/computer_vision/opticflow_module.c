@@ -113,35 +113,6 @@ void opticflow_module_init(void)
  */
 void opticflow_module_run(void)
 {
-  // Send Updated data to thread
-  pthread_mutex_lock(&opticflow_mutex);
-  opticflow_state.phi = stateGetNedToBodyEulers_f()->phi;
-  opticflow_state.theta = stateGetNedToBodyEulers_f()->theta;
-
-  // Update the stabilization loops on the current calculation
-  if (opticflow_got_result) {
-    uint32_t now_ts = get_sys_time_usec();
-    uint8_t quality = opticflow_result.divergence; // FIXME, scale to some quality measure 0-255
-    AbiSendMsgOPTICAL_FLOW(OPTICFLOW_SENDER_ID, now_ts,
-                           opticflow_result.flow_x,
-                           opticflow_result.flow_y,
-                           opticflow_result.flow_der_x,
-                           opticflow_result.flow_der_y,
-                           quality,
-                           opticflow_result.div_size,
-                           opticflow_state.agl);
-    //TODO Find an appropiate quality measure for the noise model in the state filter, for now it is tracked_cnt
-    if (opticflow_result.tracked_cnt > 0) {
-      AbiSendMsgVELOCITY_ESTIMATE(OPTICFLOW_SENDER_ID, now_ts,
-                                  opticflow_result.vel_body_x,
-                                  opticflow_result.vel_body_y,
-                                  0.0f,
-                                  opticflow_result.noise_measurement
-                                 );
-    }
-    opticflow_got_result = false;
-  }
-  pthread_mutex_unlock(&opticflow_mutex);
 }
 
 /**
@@ -186,6 +157,36 @@ struct image_t *opticflow_module_calc(struct image_t *img)
   opticflow_result.vel_body_y = opticflow_result.vel_x;
 #endif
 
+
+  // Send Updated data to thread
+  pthread_mutex_lock(&opticflow_mutex);
+  opticflow_state.phi = stateGetNedToBodyEulers_f()->phi;
+  opticflow_state.theta = stateGetNedToBodyEulers_f()->theta;
+
+  // Update the stabilization loops on the current calculation
+  if (opticflow_got_result) {
+    uint32_t now_ts = get_sys_time_usec();
+    uint8_t quality = opticflow_result.divergence; // FIXME, scale to some quality measure 0-255
+    AbiSendMsgOPTICAL_FLOW(OPTICFLOW_SENDER_ID, now_ts,
+                           opticflow_result.flow_x,
+                           opticflow_result.flow_y,
+                           opticflow_result.flow_der_x,
+                           opticflow_result.flow_der_y,
+                           quality,
+                           opticflow_result.div_size,
+                           opticflow_state.agl);
+    //TODO Find an appropiate quality measure for the noise model in the state filter, for now it is tracked_cnt
+    if (opticflow_result.tracked_cnt > 0) {
+      AbiSendMsgVELOCITY_ESTIMATE(OPTICFLOW_SENDER_ID, now_ts,
+                                  opticflow_result.vel_body_x,
+                                  opticflow_result.vel_body_y,
+                                  0.0f,
+                                  opticflow_result.noise_measurement
+                                 );
+    }
+    opticflow_got_result = false;
+  }
+  pthread_mutex_unlock(&opticflow_mutex);
   return img;
 }
 
