@@ -28,6 +28,13 @@
 
 #include "zbar.h"
 #include <stdio.h>
+#include "subsystems/actuators.h"
+#include "subsystems/electrical.h"
+#include "subsystems/settings.h"
+#include "subsystems/datalink/telemetry.h"
+#include "firmwares/rotorcraft/navigation.h"
+#include "firmwares/rotorcraft/guidance.h"
+#include "state.h"
 
 #ifndef QRCODE_DRAW_RECTANGLE
 #define QRCODE_DRAW_RECTANGLE FALSE
@@ -114,6 +121,31 @@ struct image_t *qrscan(struct image_t *img)
       }
 
     }
+
+    char firstCharacter = data[0];
+    float toMoveX = 0;//stateGetPositionNed_f()->x;
+    float toMoveY = 0;//stateGetPositionNed_f()->y;
+    float toMove = 0.2;
+    if(firstCharacter=='R'){
+    	printf("Moving Right\n");
+    	toMoveY+=toMove;
+    }
+    if(firstCharacter=='L'){
+    	printf("Moving Left\n");
+        	toMoveY-=toMove;
+        }
+    if(firstCharacter=='O'){
+        	toMoveX+=toMove;
+        }
+    if(firstCharacter=='B'){
+          	toMoveX-=toMove;
+          }
+    float psi = stateGetNedToBodyEulers_f()->psi;
+    float newToMoveX = stateGetPositionNed_f()->x + cosf(-psi) * toMoveX + sinf(-psi) * toMoveY;
+    float newToMoveY = stateGetPositionNed_f()->y - sinf(-psi) * toMoveX + cosf(-psi) * toMoveY;
+
+     guidance_h_set_guided_pos(newToMoveX,newToMoveY);
+//     printf("Doing something yeaaah moving\n");
     // TODO: not allowed to access telemetry from vision thread
 #if DOWNLINK
     DOWNLINK_SEND_INFO_MSG(DefaultChannel, DefaultDevice, strlen(data), data);

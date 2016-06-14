@@ -34,12 +34,7 @@
 
     <module name="video_thread">
     </module>
-<!--    <module name="cv_qrcode">
- <define name="QRCODE_DRAW_RECTANGLE" value="TRUE"/>
-     <define name="QRCODE_CAMERA" value="bottom_camera"/>
     
-    </module>
--->
  <module name="sonar_bebop"/>
 
  <module name="cv_opticflow">
@@ -48,7 +43,14 @@
      <define name="OPTICFLOW_CAMERA" value="bottom_camera"/>
     <define name="CAMERA_ROTATED_180" value="TRUE"/>
     </module>
-    <module name="video_rtp_stream">
+
+<module name="cv_qrcode">
+     <define name="QRCODE_DRAW_RECTANGLE" value="TRUE"/>
+     <define name="QRCODE_CAMERA" value="bottom_camera"/>
+    
+    </module>
+
+   <module name="video_rtp_stream">
         <define name="VIEWVIDEO_CAMERA" value="bottom_camera"/>
     </module>
 
@@ -89,12 +91,12 @@
 
   <section name="IMU" prefix="IMU_">
     <!-- Magneto calibration -->
-    <define name="MAG_X_NEUTRAL" value="18"/>
-    <define name="MAG_Y_NEUTRAL" value="157"/>
-    <define name="MAG_Z_NEUTRAL" value="49"/>
-    <define name="MAG_X_SENS" value="10.5007722373" integer="16"/>
-    <define name="MAG_Y_SENS" value="11.1147400462" integer="16"/>
-    <define name="MAG_Z_SENS" value="11.6479371722" integer="16"/>
+    <define name="MAG_X_NEUTRAL" value="166"/>
+    <define name="MAG_Y_NEUTRAL" value="21"/>
+    <define name="MAG_Z_NEUTRAL" value="202"/>
+	<define name="MAG_X_SENS" value="6.90518428178" integer="16"/>
+	<define name="MAG_Y_SENS" value="7.14998083717" integer="16"/>
+	<define name="MAG_Z_SENS" value="6.91930289812" integer="16"/>
 
     <!-- Magneto current calibration -->
     <define name="MAG_X_CURRENT_COEF" value="0.0"/>
@@ -179,7 +181,7 @@
     <define name="MAX_BANK" value="20" unit="deg"/>
     <!-- Bad weather -->
     <!-- define name="MAX_BANK" value="32" unit="deg"/ -->
-    <define name="PGAIN" value="79"/>
+    <define name="PGAIN" value="350"/>
     <define name="DGAIN" value="100"/>
     <define name="IGAIN" value="30"/>
   </section>

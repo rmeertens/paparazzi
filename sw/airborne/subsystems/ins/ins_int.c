@@ -550,7 +550,7 @@ static void vel_est_cb(uint8_t sender_id __attribute__((unused)),
   int deltaposy= dt * vel_ned.y;
 //  int deltaposx = POS_BFP_OF_REAL(dt * vel_ned.x);
 //  int deltaposy= POS_BFP_OF_REAL(dt * vel_ned.y);
-  printf("Delta pos x: %d float: %d delta pos y: %d float: %d\n",deltaposx,vel_ned.x,deltaposy,vel_ned.y);
+//  printf("Delta pos x: %d float: %d delta pos y: %d float: %d\n",deltaposx,vel_ned.x,deltaposy,vel_ned.y);
     ins_int.ltp_pos.x = ins_int.ltp_pos.x + deltaposx;
     ins_int.ltp_pos.y = ins_int.ltp_pos.y + deltaposy;
 //  }
