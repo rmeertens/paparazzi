@@ -510,17 +510,22 @@ static void vel_est_cb(uint8_t sender_id __attribute__((unused)),
                        float x, float y, float z,
                        float noise __attribute__((unused)))
 {
-	x = 10*x;
-	y=10*y;
-  struct FloatVect3 vel_body = {x, y, z};
+//  struct FloatVect3 vel_body = {x, y, z};
+	  struct Int32Vect3 vel_body = { POS_BFP_OF_REAL(x), POS_BFP_OF_REAL(y),  POS_BFP_OF_REAL(z)};
+
   static uint32_t last_stamp = 0;
   float dt = 0;
 
   /* rotate velocity estimate to nav/ltp frame */
-  struct FloatQuat q_b2n = *stateGetNedToBodyQuat_f();
+//  struct FloatQuat q_b2n = *stateGetNedToBodyQuat_f();
+  struct Int32Quat q_b2n = *stateGetNedToBodyQuat_i();
+
   QUAT_INVERT(q_b2n, q_b2n);
-  struct FloatVect3 vel_ned;
-  float_quat_vmult(&vel_ned, &q_b2n, &vel_body);
+//  struct FloatVect3 vel_ned;
+
+  struct Int32Vect3 vel_ned;
+//  float_quat_vmult(&vel_ned, &q_b2n, &vel_body);
+  int32_quat_vmult(&vel_ned, &q_b2n, &vel_body);
 
   if (last_stamp > 0) {
     dt = (float)(stamp - last_stamp) * 1e-6;
@@ -537,12 +542,15 @@ static void vel_est_cb(uint8_t sender_id __attribute__((unused)),
 //  b2_hff_update_vel(vel,  Rvel);
 //  ins_update_from_hff();
 //#else
-  ins_int.ltp_speed.x = SPEED_BFP_OF_REAL(vel_ned.x);
-  ins_int.ltp_speed.y = SPEED_BFP_OF_REAL(vel_ned.y);
+  ins_int.ltp_speed.x = SPEED_BFP_OF_REAL(POS_FLOAT_OF_BFP(vel_ned.x));
+  ins_int.ltp_speed.y = SPEED_BFP_OF_REAL(POS_FLOAT_OF_BFP(vel_ned.y));
 //  if (last_stamp > 0) {
-  int deltaposx = POS_BFP_OF_REAL(dt * vel_ned.x);
-  int deltaposy= POS_BFP_OF_REAL(dt * vel_ned.y);
-  printf("Delta pos x: %d float: %f delta pos y: %d float: %f\n",deltaposx,vel_ned.x,deltaposy,vel_ned.y);
+
+  int deltaposx = dt * vel_ned.x;
+  int deltaposy= dt * vel_ned.y;
+//  int deltaposx = POS_BFP_OF_REAL(dt * vel_ned.x);
+//  int deltaposy= POS_BFP_OF_REAL(dt * vel_ned.y);
+  printf("Delta pos x: %d float: %d delta pos y: %d float: %d\n",deltaposx,vel_ned.x,deltaposy,vel_ned.y);
     ins_int.ltp_pos.x = ins_int.ltp_pos.x + deltaposx;
     ins_int.ltp_pos.y = ins_int.ltp_pos.y + deltaposy;
 //  }
