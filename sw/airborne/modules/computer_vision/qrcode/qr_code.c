@@ -123,9 +123,9 @@ struct image_t *qrscan(struct image_t *img)
     }
 
     char firstCharacter = data[0];
-    float toMoveX = 0;//stateGetPositionNed_f()->x;
-    float toMoveY = 0;//stateGetPositionNed_f()->y;
-    float toMove = 0.2;
+    float toMoveX = 0.0;//stateGetPositionNed_f()->x;
+    float toMoveY = 0.0;//stateGetPositionNed_f()->y;
+    float toMove = 0.1;
     if(firstCharacter=='R'){
     	printf("Moving Right\n");
     	toMoveY+=toMove;

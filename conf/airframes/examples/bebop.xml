@@ -184,6 +184,12 @@
     <define name="PGAIN" value="350"/>
     <define name="DGAIN" value="100"/>
     <define name="IGAIN" value="30"/>
+
+    <define name="MAX_POS_ERR_METER" value="0.2"/>
+    <define name="MAX_SPEED_ERR_METER" value="0.2"/>
+    <define name="GUIDED_KEEP_POS_ON_SWITCH" value="TRUE"/>
+
+
   </section>
 
   <section name="NAVIGATION" prefix="NAV_">
