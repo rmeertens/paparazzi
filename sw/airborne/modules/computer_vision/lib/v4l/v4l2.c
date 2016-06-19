@@ -97,7 +97,7 @@ static void *v4l2_capture_thread(void *data)
     assert(buf.index < dev->buffers_cnt);
 
     // Copy the timestamp
-    dev->buffers[buf.index].timestamp = buf.timestamp.tv_usec;
+    dev->buffers[buf.index].timestamp = 1.0e6 * buf.timestamp.tv_sec + buf.timestamp.tv_usec;
     dev->buffers[buf.index].pprz_timestamp = now_ts;
     // Update the dequeued id
     // We need lock because between setting prev_idx and updating the deq_idx the deq_idx could change
@@ -393,7 +393,7 @@ bool v4l2_image_get_nonblock(struct v4l2_device *dev, struct image_t *img)
     img->buf_idx = img_idx;
     img->buf_size = dev->buffers[img_idx].length;
     img->buf = dev->buffers[img_idx].buf;
-    memcpy(&img->ts, &dev->buffers[img_idx].timestamp, sizeof(struct timeval));
+    img->ts = dev->buffers[img_idx].timestamp;
     return true;
   }
 }
