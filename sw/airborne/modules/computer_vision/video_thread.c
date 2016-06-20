@@ -38,6 +38,7 @@
 #include "lib/v4l/v4l2.h"
 #include "lib/vision/image.h"
 #include "lib/vision/bayer.h"
+#include "lib/isp/libisp.h"
 
 #include "mcu_periph/sys_time.h"
 
@@ -64,7 +65,9 @@ struct video_config_t *cameras[VIDEO_THREAD_MAX_CAMERAS];
 
 // Main thread
 static void *video_thread_function(void *data);
-
+static bool initialize_camera(struct video_config_t *camera);
+static void start_video_thread(struct video_config_t *camera);
+static void stop_video_thread(struct video_config_t *device);;
 
 void video_thread_periodic(void)
 {
@@ -83,7 +86,7 @@ static void *video_thread_function(void *data)
   struct image_t img_color;
 
   // create the images
-  if (vid->filters) {
+  if (vid->filters & VIDEO_FILTER_DEBAYER) {
     // fixme: don't hardcode size, works for bebop front camera for now
 #define IMG_FLT_SIZE 272
     image_create(&img_color, IMG_FLT_SIZE, IMG_FLT_SIZE, IMAGE_YUV422);
@@ -93,6 +96,11 @@ static void *video_thread_function(void *data)
   if (!v4l2_start_capture(vid->thread.dev)) {
     printf("[video_thread-thread] Could not start capture of %s.\n", vid->thread.dev->name);
     return 0;
+  }
+
+  // Configure ISP if needed
+  if (vid->filters & VIDEO_FILTER_ISP) {
+    configure_isp(vid->thread.dev);
   }
 
   // be nice to the more important stuff
@@ -131,10 +139,8 @@ static void *video_thread_function(void *data)
     struct image_t *img_final = &img;
 
     // run selected filters
-    if (vid->filters) {
-      if (vid->filters & VIDEO_FILTER_DEBAYER) {
-        BayerToYUV(&img, &img_color, 0, 0);
-      }
+    if (vid->filters & VIDEO_FILTER_DEBAYER) {
+      BayerToYUV(&img, &img_color, 0, 0);
       // use color image for further processing
       img_final = &img_color;
     }
@@ -151,14 +157,12 @@ static void *video_thread_function(void *data)
   return 0;
 }
 
-
-bool initialize_camera(struct video_config_t *camera);
-bool initialize_camera(struct video_config_t *camera)
+static bool initialize_camera(struct video_config_t *camera)
 {
   // Initialize the V4L2 subdevice if needed
   if (camera->subdev_name != NULL) {
     // FIXME! add subdev format to config, only needed on bebop front camera so far
-    if (!v4l2_init_subdev(camera->subdev_name, 0, 0, V4L2_MBUS_FMT_SGBRG10_1X10, camera->w, camera->h)) {
+    if (!v4l2_init_subdev(camera->subdev_name, 0, 0, camera->subdev_format, camera->sensor_w, camera->sensor_h)) {
       printf("[video_thread] Could not initialize the %s subdevice.\n", camera->subdev_name);
       return false;
     }
@@ -175,7 +179,9 @@ bool initialize_camera(struct video_config_t *camera)
   return true;
 }
 
-
+/*
+ * Add a new video device to the list
+ */
 bool add_video_device(struct video_config_t *device)
 {
   // Loop over camera array
@@ -209,8 +215,10 @@ bool add_video_device(struct video_config_t *device)
   return false;
 }
 
-void start_video_thread(struct video_config_t *camera);
-void start_video_thread(struct video_config_t *camera)
+/*
+ * Start a new video thread for a camera
+ */
+static void start_video_thread(struct video_config_t *camera)
 {
   if (!camera->thread.is_running) {
     // Start the streaming thread for a camera
@@ -222,8 +230,10 @@ void start_video_thread(struct video_config_t *camera)
   }
 }
 
-void stop_video_thread(struct video_config_t *device);
-void stop_video_thread(struct video_config_t *device)
+/*
+ * Stop a video thread for a camera
+ */
+static void stop_video_thread(struct video_config_t *device)
 {
   if (device->thread.is_running) {
     // Stop the streaming thread
