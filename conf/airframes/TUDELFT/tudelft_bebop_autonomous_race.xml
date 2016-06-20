@@ -35,6 +35,8 @@
     <module name="video_thread">
     </module>
     
+    <module name="pose_history">
+    </module>
     <module name="sonar_bebop"/>
 
     <module name="cv_opticflow">
