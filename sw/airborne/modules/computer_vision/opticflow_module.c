@@ -92,8 +92,7 @@ void opticflow_module_init(void)
   AbiBindMsgAGL(OPTICFLOW_AGL_ID, &opticflow_agl_ev, opticflow_agl_cb);
 
   // Set the opticflow state to 0
-  opticflow_state.phi = 0;
-  opticflow_state.theta = 0;
+  FLOAT_RATES_ZERO(opticflow_state.rates);
   opticflow_state.agl = 0;
 
   // Initialize the opticflow calculation
@@ -113,11 +112,7 @@ void opticflow_module_init(void)
  */
 void opticflow_module_run(void)
 {
-  // Send Updated data to thread
   pthread_mutex_lock(&opticflow_mutex);
-  opticflow_state.phi = stateGetNedToBodyEulers_f()->phi;
-  opticflow_state.theta = stateGetNedToBodyEulers_f()->theta;
-
   // Update the stabilization loops on the current calculation
   if (opticflow_got_result) {
     uint32_t now_ts = get_sys_time_usec();
@@ -155,11 +150,10 @@ struct image_t *opticflow_module_calc(struct image_t *img)
 {
 
   // Copy the state
-
-  pthread_mutex_lock(&opticflow_mutex);
+  timeAndRotation tar = get_rotation_at_timestamp(img->pprz_ts);
   struct opticflow_state_t temp_state;
-  memcpy(&temp_state, &opticflow_state, sizeof(struct opticflow_state_t));
-  pthread_mutex_unlock(&opticflow_mutex);
+  temp_state.agl = opticflow_state.agl;
+  temp_state.rates = tar.rates;
 
   // Do the optical flow calculation
   struct opticflow_result_t temp_result = {}; // new initialization
