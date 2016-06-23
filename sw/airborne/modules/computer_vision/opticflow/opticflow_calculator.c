@@ -130,7 +130,7 @@ PRINT_CONFIG_VAR(OPTICFLOW_FAST9_MIN_DISTANCE)
 #ifndef OPTICFLOW_FAST9_PADDING
 #define OPTICFLOW_FAST9_PADDING 20
 #endif
-PRINT_CONFIG_VAR(OPTICFLOW_FAST9_MIN_DISTANCE)
+PRINT_CONFIG_VAR(OPTICFLOW_FAST9_PADDING)
 
 // thresholds FAST9 that are currently not set from the GCS:
 #define FAST9_LOW_THRESHOLD 5
@@ -356,11 +356,7 @@ void calc_fast9_lukas_kanade(struct opticflow_t *opticflow, struct opticflow_sta
 
   // Determine quality of noise measurement for state filter
   //TODO Experiment with multiple noise measurement models
-  if (result->tracked_cnt < 10) {
-    result->noise_measurement = (float)result->tracked_cnt / (float)opticflow->max_track_corners;
-  } else {
-    result->noise_measurement = 1.0;
-  }
+  result->noise_measurement = (float)result->tracked_cnt / (float)opticflow->max_track_corners;
 
   // *************************************************************************************
   // Next Loop Preparation

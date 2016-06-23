@@ -40,8 +40,8 @@
 /* Camera structure */
 struct video_config_t bottom_camera = {
   .output_size = {
-    .w = 120,
-    .h = 120
+    .w = 240,
+    .h = 240
   },
   .sensor_size = {
     .w = 320,

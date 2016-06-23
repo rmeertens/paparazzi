@@ -38,10 +38,10 @@
       <define name="MAX_HORIZON" value="2"/>
       <define name="CAMERA_ROTATED_180" value="1"/>
       <!--define name="OPTICFLOW_DEROTATION" value="0"/-->
-      <define name="OPTICFLOW_FX" value="185.18518519"/>
-      <define name="OPTICFLOW_FY" value="185.18518519"/>
-      <define name="OPTICFLOW_FOV_W" value="0.3574434308"/> <!-- 0.67020643276 * 128 / 240 -->
-      <define name="OPTICFLOW_FOV_H" value="0.3574434308"/>
+      <define name="OPTICFLOW_FX" value="347.22222222"/> <!-- 2.5 / (3.6 * 2.0) * 1000 -->
+      <define name="OPTICFLOW_FY" value="347.22222222"/> <!-- 2.5 / (3.6 * 2.0) * 1000 -->
+      <define name="OPTICFLOW_FOV_W" value="0.665499265"/>
+      <define name="OPTICFLOW_FOV_H" value="0.665499265"/>
     </module>
 
     <module name="video_capture">
@@ -49,11 +49,11 @@
       <define name="VIDEO_CAPTURE_PATH" value="/data/ftp/internal_000/images"/>
     </module>
 
-    <module name="video_rtp_stream">
+    <!--module name="video_rtp_stream">
       <define name="VIEWVIDEO_CAMERA" value="bottom_camera"/>
       <define name="VIEWVIDEO_DOWNSIZE_FACTOR" value="1"/>
       <define name="VIEWVIDEO_QUALITY_FACTOR" value="60"/>
-    </module>
+    </module-->
 
 
   </modules>
