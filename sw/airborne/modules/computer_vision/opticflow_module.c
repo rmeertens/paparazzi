@@ -37,7 +37,7 @@
 #include "lib/encoding/jpeg.h"
 #include "lib/encoding/rtp.h"
 #include "errno.h"
-
+#include "modules/pose_history/pose_history.h"
 #include "cv.h"
 
 /* Default sonar/agl to use in opticflow visual_estimator */

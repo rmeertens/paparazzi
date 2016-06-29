@@ -35,6 +35,7 @@
     <module name="video_thread">
     </module>
     
+    <module name="pose_history"/>
     <module name="sonar_bebop"/>
 
     <module name="cv_opticflow">
@@ -43,7 +44,7 @@
        <define name="CAMERA_ROTATED_180" value="TRUE"/>
     </module>
     <module name="video_rtp_stream">
-       <define name="VIEWVIDEO_CAMERA" value="bottom_camera"/>
+       <define name="VIEWVIDEO_CAMERA" value="front_camera"/>
     </module>
   </modules>
 

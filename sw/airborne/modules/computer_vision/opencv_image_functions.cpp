@@ -34,32 +34,3 @@ using namespace std;
 #include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
 
-void color_opencv_to_yuv422(Mat image, char *img, int width, int height)
-{
-  // Convert to YUV color space
-  cvtColor(image, image, COLOR_BGR2YUV);
-
-  for (int row = 0; row < height; row++) {
-    for (int col = 0; col < width; col++) {
-      // Extract pixel color from image
-      cv::Vec3b &c = image.at<cv::Vec3b>(row, col);
-
-      // Set image buffer values
-      int i = row * width + col;
-      img[2 * i + 1] = c[0]; // y;
-      img[2 * i] = col % 2 ? c[1] : c[2]; // u or v
-    }
-  }
-}
-
-
-void grayscale_opencv_to_yuv422(Mat image, char *img, int width, int height)
-{
-  for (int row = 0; row < height; row++) {
-    for (int col = 0; col < width; col++) {
-
-      img[(row * width + col) * 2 + 1] =   image.at<uint8_t>(row, col);
-      img[(row * width + col) * 2 ] = 127;
-    }
-  }
-}
