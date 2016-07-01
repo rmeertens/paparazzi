@@ -114,17 +114,17 @@ void board_init2(void)
     .row_speed_10_8 = 1,
 
     // Initial values
-    .target_fps = 5,
+    .target_fps = MT9F002_DESIRED_FPS, // a wish for the camera to deliver images at this speed. Hardware bound...
     .target_exposure = 30,
     .gain_green1 = 2.0,
     .gain_blue = 2.0,
     .gain_red = 2.0,
     .gain_green2 = 2.0,
-    .output_width = 2048,
-    .output_height = 3320,
-    .output_scaler = 1.0,
-    .offset_x = 1000,
-    .offset_y = 0,
+    .output_width = MT9F002_OUTPUT_SIZE_WIDTH,
+    .output_height = MT9F002_OUTPUT_SIZE_HEIGHT,
+    .output_scaler =MT9F002_OUTPUT_SCALER, //1.0 is normal. 0.5 means double the image, but in the same amount of pixels.
+    .offset_x = MT9F002_CROP_X,
+    .offset_y = MT9F002_CROP_Y,
 
     // I2C connection port
     .i2c_periph = &i2c0

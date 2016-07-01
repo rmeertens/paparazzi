@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 uint8_t safeToGoForwards = false;
 int tresholdColorCount = 200;
 int32_t incrementForAvoidance;
@@ -55,6 +56,8 @@ uint8_t increase_nav_heading(int32_t *heading, int32_t increment)
   INT32_ANGLE_NORMALIZE(*heading); // HEADING HAS INT32_ANGLE_FRAC....
   return false;
 }
+
+
 uint8_t moveWaypointForwards(uint8_t waypoint, float distanceMeters)
 {
   struct EnuCoor_i new_coor;

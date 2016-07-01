@@ -9,7 +9,40 @@
       <module name="fdm" type="jsbsim"/>
       <module name="udp"/>
     </target>
+ <define name="MT9F002_SENSOR_SIZE_WIDTH" value="1024"/>
+    <define name="MT9F002_SENSOR_SIZE_HEIGHT" value="1320"/>
+    <define name="MT9F002_OUTPUT_SIZE_WIDTH" value="1024"/>
+    <define name="MT9F002_OUTPUT_SIZE_HEIGHT" value="1320"/>
+   <define name="MT9F002_CROP_SIZE_WIDTH" value="1024"/>
+    <define name="MT9F002_CROP_SIZE_HEIGHT" value="1320"/>
+<define name="MT9F002_CROP_X" value="2000"/>
+    <define name="MT9F002_CROP_Y" value="400"/>
+<define name="MT9F002_OUTPUT_SCALER" value="0.5"/><!--/1.0 is normal. 0.5 means double the image, but in the same amount of pixels.-->
 
+    <define name="MT9F002_DESIRED_FPS" value="30"/> <!-- you can bound the hardware to a certain fps by setting this low. Otherwise the chip tries as hard as he can ;) -->
+
+
+<!-- working!  
+    <define name="MT9F002_SENSOR_SIZE_WIDTH" value="2048"/>
+    <define name="MT9F002_SENSOR_SIZE_HEIGHT" value="3320"/>
+    <define name="MT9F002_OUTPUT_SIZE_WIDTH" value="2048"/>
+    <define name="MT9F002_OUTPUT_SIZE_HEIGHT" value="3320"/>
+   <define name="MT9F002_CROP_SIZE_WIDTH" value="2048"/>
+    <define name="MT9F002_CROP_SIZE_HEIGHT" value="3320"/>
+<define name="MT9F002_CROP_X" value="0"/>
+    <define name="MT9F002_CROP_Y" value="0"/>
+-->
+
+<!-- working 2
+<define name="MT9F002_SENSOR_SIZE_WIDTH" value="2048"/>
+    <define name="MT9F002_SENSOR_SIZE_HEIGHT" value="3320"/>
+    <define name="MT9F002_OUTPUT_SIZE_WIDTH" value="2048"/>
+    <define name="MT9F002_OUTPUT_SIZE_HEIGHT" value="3320"/>
+   <define name="MT9F002_CROP_SIZE_WIDTH" value="2048"/>
+    <define name="MT9F002_CROP_SIZE_HEIGHT" value="3320"/>
+<define name="MT9F002_CROP_X" value="2000"/>
+    <define name="MT9F002_CROP_Y" value="400"/>
+-->
     <!--define name="USE_SONAR" value="TRUE"/-->
 
 	<!-- Subsystem section -->
@@ -34,7 +67,7 @@
 
     <module name="video_thread">
     </module>
-    
+    <!--
     <module name="pose_history"/>
     <module name="sonar_bebop"/>
 
@@ -42,7 +75,7 @@
        <define name="OPTICFLOW_METHOD" value="1"/>
        <define name="OPTICFLOW_CAMERA" value="bottom_camera"/>
        <define name="CAMERA_ROTATED_180" value="TRUE"/>
-    </module>
+    </module>-->
     <module name="video_rtp_stream">
        <define name="VIEWVIDEO_CAMERA" value="front_camera"/>
     </module>
