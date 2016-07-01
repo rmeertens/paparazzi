@@ -37,15 +37,36 @@
     
     <module name="pose_history"/>
     <module name="sonar_bebop"/>
-
+<!--
     <module name="cv_opticflow">
        <define name="OPTICFLOW_METHOD" value="1"/>
        <define name="OPTICFLOW_CAMERA" value="bottom_camera"/>
        <define name="CAMERA_ROTATED_180" value="TRUE"/>
     </module>
     <module name="video_rtp_stream">
-       <define name="VIEWVIDEO_CAMERA" value="front_camera"/>
+       <define name="VIEWVIDEO_CAMERA" value="bottom_camera"/>
     </module>
+-->
+
+ <module name="cv_opticflow">
+      <define name="OPTICFLOW_CAMERA" value="bottom_camera"/>
+      <define name="MAX_HORIZON" value="2"/>
+      <!--<define name="CAMERA_ROTATED_180" value="1"/>-->
+      <!--define name="OPTICFLOW_DEROTATION" value="0"/-->
+      <define name="OPTICFLOW_FX" value="347.22222222"/> <!-- 2.5 / (3.6 * 2.0) * 1000 -->
+      <define name="OPTICFLOW_FY" value="347.22222222"/> <!-- 2.5 / (3.6 * 2.0) * 1000 -->
+      <define name="OPTICFLOW_FOV_W" value="0.665499265"/>
+      <define name="OPTICFLOW_FOV_H" value="0.665499265"/>
+    </module>
+
+
+    <module name="guided_test"/>
+    <module name="video_rtp_stream">
+      <define name="VIEWVIDEO_CAMERA" value="front_camera"/>
+      <define name="VIEWVIDEO_DOWNSIZE_FACTOR" value="4"/>
+      <define name="VIEWVIDEO_QUALITY_FACTOR" value="60"/>
+    </module>
+
   </modules>
 
   <commands>
@@ -170,13 +191,13 @@
 
   <section name="GUIDANCE_H" prefix="GUIDANCE_H_">
     <!-- Good weather -->
-    <define name="MAX_BANK" value="20" unit="deg"/>
+    <define name="MAX_BANK" value="10" unit="deg"/>
     <!-- Bad weather -->
     <!-- define name="MAX_BANK" value="32" unit="deg"/ -->
-    <define name="PGAIN" value="350"/>
+    <define name="PGAIN" value="150"/>
     <define name="DGAIN" value="100"/>
     <define name="IGAIN" value="30"/>
-    <define name="REF_MAX_SPEED" value="0.2"/>
+    <define name="REF_MAX_SPEED" value="0.1"/>
   </section>
 
   <section name="NAVIGATION" prefix="NAV_">
