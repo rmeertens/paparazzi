@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Peng Lu
+ * Copyright (C) 2016 Roland Meertens and Peng Lu
  *
  * This file is part of Paparazzi.
  *
@@ -21,32 +21,23 @@
 
 /**
  * @file modules/computer_vision/opencv_contour.h
- *
- * A small library with functions to convert between the Paparazzi used YUV422 arrays
- * and the opencv image functions.
+ * Detects contours of an obstacle used in the autonomous drone racing.
  */
 
 #ifndef OPENCV_CONTOUR_H
 #define OPENCV_CONTOUR_H
-// added by peng
-//#include <opencv2/core/core.hpp>
-//#include <opencv2/imgproc/imgproc.hpp>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int find_contour(char *img, int width, int height);
+extern float contour_distance_est;
+extern float contour_d_x, contour_d_y, contour_d_z;
 
-//---------------------- distance estimate -----------------------//
-//extern void pos_err_est_call(float dx, float dy, float dz);
-extern float pos_err_x(void);
-extern float pos_err_y(void);
-extern float pos_err_z(void);
-extern float distance_est;
-//---------------------- distance estimate -----------------------//
+// values for thresholding the contour
+extern int lower_y, upper_y, lower_u, upper_u, lower_v, upper_v;
 
-//void yuv_opencv_to_yuv422(CV::Mat image, char *img, int width, int height);
+void find_contour(char *img, int width, int height);
 
 #ifdef __cplusplus
 }

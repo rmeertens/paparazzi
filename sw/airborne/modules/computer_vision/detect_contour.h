@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Peng Lu
+ * Copyright (C) Roland Meertens and Peng Lu
  *
  * This file is part of paparazzi
  *
@@ -18,15 +18,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 /**
- * @file "modules/computer_vision/cv_opencvdemo.h"
- * @author Peng Lu
- * opencv
+ * @file "modules/computer_vision/detect_contour.h"
+ * @author Roland Meertens and Peng Lu
+ * A module that detects contours of obstacles as used in autonomous drone races.
  */
 
 #ifndef DETECT_CONTOUR_H
 #define DETECT_CONTOUR_H
 
-extern void opencvdemo_init(void);
+extern void detect_contour_init(void);
 
 #endif
 

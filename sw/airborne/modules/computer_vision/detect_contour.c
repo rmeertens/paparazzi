@@ -1,5 +1,5 @@
 /*
- * Copyright (C) Peng Lu
+ * Copyright (C) Roland Meertens and Peng Lu
  *
  * This file is part of paparazzi
  *
@@ -18,37 +18,36 @@
  * <http://www.gnu.org/licenses/>.
  */
 /**
- * @file "modules/computer_vision/cv_opencvdemo.c"
- * @author Peng Lu
- * A simple module showing what you can do with opencv on the bebop.
+ * @file "modules/computer_vision/detect_contour.c"
+ * @author Roland Meertens and Peng Lu
+ *
  */
 
 #include "modules/computer_vision/cv.h"
 #include "modules/computer_vision/detect_contour.h"
 #include "modules/computer_vision/opencv_contour.h"
-//
-
-
 
 // Function
-int opencv_func(struct image_t* img);
-int opencv_func(struct image_t* img)
+struct image_t *contour_func(struct image_t *img);
+struct image_t *contour_func(struct image_t *img)
 {
 
-  if (img->type == IMAGE_YUV422)
-  {
+  if (img->type == IMAGE_YUV422) {
     // Call OpenCV (C++ from paparazzi C function)
-    find_contour((char*) img->buf, img->w, img->h);
+    find_contour((char *) img->buf, img->w, img->h);
   }
-
-// opencv_example(NULL, 10,10);
-
-  return FALSE;
+  return img;
 }
 
-void opencvdemo_init(void)
+void detect_contour_init(void)
 {
-  //cv_add(opencv_func);
-  cv_add_to_device(&OPENCVDEMO_CAMERA, opencv_func);
+  cv_add_to_device(&DETECT_CONTOUR_CAMERA, contour_func);
+  // in the mavlab, bright
+  lower_y = 16;  lower_u = 135; lower_v = 80;
+  upper_y = 100; upper_u = 175; upper_v = 165;
+  //
+  // for cyberzoo: Y:12-95, U:129-161, V:80-165, turn white.
+  //int y1=16;  int u1=129; int v1=80; % cyberzoo, dark
+  //int y2=100; int u2=161; int v2=165;
 }
 
