@@ -73,6 +73,8 @@
 
   <header>
     <file name="opticflow_module.h"/>
+
+    <file name="opencv_opticflow.h" dir = "modules/computer_vision/opticflow"/>
   </header>
 
   <init fun="opticflow_module_init()"/>
@@ -85,6 +87,7 @@
     <file name="jpeg.c" dir="modules/computer_vision/lib/encoding"/>
     <file name="rtp.c" dir="modules/computer_vision/lib/encoding"/>
     <file name="v4l2.c" dir="modules/computer_vision/lib/v4l"/>
+    <file name="opencv_opticflow.cpp" dir="modules/computer_vision/opticflow"/>
 
     <!-- The optical flow module (calculator) -->
     <file name="opticflow_module.c"/>
@@ -98,6 +101,24 @@
     <file name="fast_rosten.c" dir="modules/computer_vision/lib/vision"/>
     <file name="lucas_kanade.c" dir="modules/computer_vision/lib/vision"/>
     <file name="edge_flow.c" dir="modules/computer_vision/lib/vision"/>
+
+<flag name="CXXFLAGS" value="I$(PAPARAZZI_SRC)/sw/ext/opencv_bebop/install/include"/>
+
+      <flag name="LDFLAGS" value="L$(PAPARAZZI_HOME)/sw/ext/opencv_bebop/install/lib" />
+        <flag name="LDFLAGS" value="lopencv_video" />
+        <flag name="LDFLAGS" value="lopencv_videoio" />
+        <flag name="LDFLAGS" value="lopencv_imgcodecs" />
+        <flag name="LDFLAGS" value="lopencv_imgproc" />
+        <flag name="LDFLAGS" value="lopencv_core" />
+        <flag name="LDFLAGS" value="L$(PAPARAZZI_HOME)/sw/ext/opencv_bebop/install/share/OpenCV/3rdparty/lib" />
+        <flag name="LDFLAGS" value="lzlib" />
+        <flag name="LDFLAGS" value="llibpng" />
+        <flag name="LDFLAGS" value="lstdc++" />
+        <flag name="LDFLAGS" value="ldl" />
+        <flag name="LDFLAGS" value="lm" />
+        <flag name="LDFLAGS" value="lpthread" />
+        <flag name="LDFLAGS" value="lrt" />
+
   </makefile>
 
 

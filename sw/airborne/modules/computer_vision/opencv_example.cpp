@@ -359,7 +359,7 @@ int opencv_example(char *img, int width, int height) {
 	Mat M(height, width, CV_8UC2, img); // original
 	Mat hsvImage;
 	Mat rgbImage;
-	cvtColor(M,rgbImage,CV_YUV2BGRA_Y422);
+	cvtColor(M,rgbImage,CV_YUV2BGR_Y422);
 
 	cvtColor(rgbImage,hsvImage,CV_BGR2HSV);
 

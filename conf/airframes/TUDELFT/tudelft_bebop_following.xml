@@ -63,6 +63,7 @@
 	<define name="OPTICFLOW_FOV_W" value="0.89"/>
 
     </module>-->
+<!--
 <module name="video_usb_logger">
        <define name="VIDEO_USB_LOGGER_CAMERA" value="bottom_camera"/>
 </module>
@@ -72,7 +73,7 @@
 	<define name="VIEWVIDEO_DOWNSIZE_FACTOR" value="1"/>
 
 	<define name="VIEWVIDEO_QUALITY_FACTOR" value="99"/>
-    </module>
+    </module>-->
   </modules>
 
   <commands>
@@ -224,7 +225,7 @@
     <define name="MODE_STARTUP" value="AP_MODE_NAV"/>
     <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
     <define name="MODE_AUTO1" value="AP_MODE_ATTITUDE_Z_HOLD"/>
-    <define name="MODE_AUTO2" value="AP_MODE_GUIDED"/>
+    <define name="MODE_AUTO2" value="AP_MODE_NAV"/>
   </section>
 
   <section name="BAT">

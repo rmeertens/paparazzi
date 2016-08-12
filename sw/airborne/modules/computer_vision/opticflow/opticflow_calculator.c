@@ -35,7 +35,7 @@
 
 // Own Header
 #include "opticflow_calculator.h"
-
+#include "opencv_opticflow.h"
 // Computer Vision
 #include "lib/vision/image.h"
 #include "lib/vision/lucas_kanade.h"
@@ -68,11 +68,15 @@ PRINT_CONFIG_VAR(OPTICFLOW_FOV_H)
 
 #ifndef OPTICFLOW_FX
 #define OPTICFLOW_FX 343.1211
+// Bebop
+#define OPTICFLOW_FX 266.8145454
 #endif
 PRINT_CONFIG_VAR(OPTICFLOW_FX)
 
 #ifndef OPTICFLOW_FY
 #define OPTICFLOW_FY 348.5053
+// Bebop
+#define OPTICFLOW_FY 268.54527111
 #endif
 PRINT_CONFIG_VAR(OPTICFLOW_FY)
 
@@ -141,7 +145,7 @@ PRINT_CONFIG_VAR(OPTICFLOW_FAST9_PADDING)
 #endif
 PRINT_CONFIG_VAR(OPTICFLOW_METHOD)
 
-#if OPTICFLOW_METHOD > 1
+#if OPTICFLOW_METHOD > 2
 #error WARNING: Both Lukas Kanade and EdgeFlow are NOT selected
 #endif
 
@@ -219,6 +223,8 @@ void calc_fast9_lukas_kanade(struct opticflow_t *opticflow, struct opticflow_sta
 
   // Update FPS for information
   result->fps = 1 / (timeval_diff(&opticflow->prev_timestamp, &img->ts) / 1000.);
+
+  // TODO Roland is this the right timestamp?
   opticflow->prev_timestamp = img->ts;
 
   // Convert image to grayscale
@@ -253,9 +259,10 @@ void calc_fast9_lukas_kanade(struct opticflow_t *opticflow, struct opticflow_sta
     }
   }
 
-#if OPTICFLOW_SHOW_CORNERS
+//#if OPTICFLOW_SHOW_CORNERS
   image_show_points(img, opticflow->fast9_ret_corners, result->corner_cnt);
-#endif
+//#endif
+  printf("treshold: %d\n",opticflow->fast9_threshold);
 
   // Check if we found some corners to track
   if (result->corner_cnt < 1) {
@@ -549,9 +556,14 @@ void opticflow_calc_frame(struct opticflow_t *opticflow, struct opticflow_state_
   // Switch between methods (0 = fast9/lukas-kanade, 1 = EdgeFlow)
   if (opticflow->method == 0) {
     calc_fast9_lukas_kanade(opticflow, state, img, result);
+    printf("Done fast9 lukas kanade\n");
   } else if (opticflow->method == 1) {
     calc_edgeflow_tot(opticflow, state, img, result);
   }
+  else if (opticflow->method == 2) {
+	 // opencv_opticflow(opticflow, state, img, result);
+	  opencv_opticflow(img->buf,img->w,img->h);
+    }
 
 }
 

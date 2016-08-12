@@ -127,6 +127,7 @@ void image_to_grayscale(struct image_t *input, struct image_t *output)
     for (int x = 0; x < output->w; x++) {
       if (output->type == IMAGE_YUV422) {
         *dest++ = 127;  // U / V
+        printf("Setting U and V in image_to_grayscale\n");
       }
       *dest++ = *source;    // Y
       source += 2;
