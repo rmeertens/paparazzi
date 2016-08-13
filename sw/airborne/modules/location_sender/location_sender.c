@@ -36,6 +36,12 @@ void send_current_location() {
 	uint32_t posy=20;
     DOWNLINK_SEND_ROLANDLOC(DefaultChannel, DefaultDevice, &posx,&posy);
 
+    // ROLAND_GO_HERE
+    // posx
+    // posy
+}
+void parse_this(){
+	printf("Parsing this");
 }
 
 

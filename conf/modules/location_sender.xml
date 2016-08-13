@@ -6,9 +6,10 @@
   </doc>
   <header>
     <file name="location_sender.h"/>
-  </header>
+  </header>	
   <periodic fun="send_current_location()" freq="1" autorun="TRUE"/>
-  <makefile>
+  <datalink message="ROLAND_GO_HERE" fun="parsethis()"/>
+   <makefile>
     <file name="location_sender.c"/>
   </makefile>
 </module>

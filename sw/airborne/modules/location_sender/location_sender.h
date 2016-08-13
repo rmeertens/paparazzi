@@ -27,6 +27,6 @@
 #define LOCATION_SENDER_H
 
 extern void send_current_location();
-
+extern void parse_this();
 #endif
 
