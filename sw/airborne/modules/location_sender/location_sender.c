@@ -42,6 +42,15 @@ void send_current_location() {
 }
 void parse_this(){
 	printf("Parsing this");
+
+	  uint8_t ac_id = DL_ROLAND_GO_HERE_posx(dl_buffer);
+/*	  uint8_t leader = DL_FORMATION_STATUS_leader_id(dl_buffer);
+	  uint8_t status = DL_FORMATION_STATUS_status(dl_buffer);
+	  if (ac_id == AC_ID) { leader_id = leader; }
+	  else if (leader == leader_id) { updateFormationStatus(ac_id, status); }
+	  else { updateFormationStatus(ac_id, UNSET); }
+	}
+*/
 }
 
 
