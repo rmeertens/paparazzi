@@ -1,0 +1,15 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="location_sender">
+  <doc>
+    <description></description>
+  </doc>
+  <header>
+    <file name="location_sender.h"/>
+  </header>
+  <periodic fun="send_current_location()" freq="1" autorun="TRUE"/>
+  <makefile>
+    <file name="location_sender.c"/>
+  </makefile>
+</module>
+
