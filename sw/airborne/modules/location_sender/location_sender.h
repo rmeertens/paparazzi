@@ -26,7 +26,7 @@
 #ifndef LOCATION_SENDER_H
 #define LOCATION_SENDER_H
 
-extern void send_current_location();
-extern void parse_this();
+extern void send_current_location(void);
+extern void parse_this(void);
 #endif
 
