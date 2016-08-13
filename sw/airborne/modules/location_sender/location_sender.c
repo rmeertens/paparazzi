@@ -24,9 +24,18 @@
  */
 
 #include "modules/location_sender/location_sender.h"
+#include <inttypes.h>
 
+#include "subsystems/datalink/telemetry.h"
 void send_current_location() {
 	printf("Sending lcoation\n");
+	// ROLANDLOC
+	// posx
+	// posy
+	uint32_t posx=10;
+	uint32_t posy=20;
+    DOWNLINK_SEND_ROLANDLOC(DefaultChannel, DefaultDevice, &posx,&posy);
+
 }
 
 
