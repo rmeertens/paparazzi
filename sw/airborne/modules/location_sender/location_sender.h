@@ -25,8 +25,11 @@
 
 #ifndef LOCATION_SENDER_H
 #define LOCATION_SENDER_H
-
+#include <inttypes.h>
 extern void send_current_location(void);
 extern void parse_this(void);
+extern uint8_t setWpToNextNUSDemo(uint8_t);
+extern uint8_t reset_route(void);
+extern uint8_t reset_write(void);
 #endif
 

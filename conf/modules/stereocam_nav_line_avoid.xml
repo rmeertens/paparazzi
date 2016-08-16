@@ -14,8 +14,8 @@
   <periodic fun="stereo_avoid_run()" freq="20" autorun="TRUE"/>
 
   <makefile>
-    <configure name="STEREO_UART" default="uart1" case="upper|lower"/>
-    <configure name="STEREO_BAUD" default="B9600"/>
+    <configure name="STEREO_UART" default="uart2" case="upper|lower"/>
+    <configure name="STEREO_BAUD" default="B115200"/>
     <configure name="STEREO_LED" default="3"/>
     <define name="USE_$(STEREO_UART_UPPER)"/>
     <define name="STEREO_UART" value="$(STEREO_UART_LOWER)"/>

@@ -97,8 +97,12 @@ extern void stereocam_stop(void)
 
 extern void stereocam_periodic(void)
 {
-  // read all data from the stereo com link, check that don't overtake extract
+	if(linkdev->char_available(linkdev->periph)){
+		printf("Checking\n");
+	}
+	// read all data from the stereo com link, check that don't overtake extract
   while (linkdev->char_available(linkdev->periph) && stereoprot_add(insert_loc, 1, STEREO_BUF_SIZE) != extract_loc) {
+	  printf("WHOO CHARACTER\n");
     if (handleStereoPackage(StereoGetch(), STEREO_BUF_SIZE, &insert_loc, &extract_loc, &msg_start, msg_buf, ser_read_buf,
                             &stereocam_data.fresh, &stereocam_data.len, &stereocam_data.matrix_width, &stereocam_data.matrix_height)) {
       freq_counter++;

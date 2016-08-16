@@ -50,7 +50,7 @@
 #include "led.h"
 
 
-
+#define TRESHOLD_TURNING 13
 
 
 struct AvoidNavigationStruct avoid_navigation_data;
@@ -73,7 +73,7 @@ void run_avoid_navigation_onvision(void)
   switch (avoid_navigation_data.mode) {
     case 0:     // Go to Goal and stop at obstacles
       //count 4 subsequent obstacles
-      if (stereocam_data.data[0] > 60) {
+      if (stereocam_data.data[0] > TRESHOLD_TURNING) {
         counter = counter + 1;
         if (counter > 1) {
           counter = 0;
@@ -87,9 +87,9 @@ void run_avoid_navigation_onvision(void)
       break;
     case 1:     // Turn until clear
       //count 20 subsequent free frames
-      if (stereocam_data.data[0] < 60) {
+      if (stereocam_data.data[0] < TRESHOLD_TURNING) {
         counter = counter + 1;
-        if (counter > 6) {
+        if (counter > 12) {
           counter = 0;
           //Stop and put waypoint 2.5 m ahead
           struct EnuCoor_i new_coor;
@@ -112,7 +112,7 @@ void run_avoid_navigation_onvision(void)
     default:    // do nothing
       break;
   }
-  avoid_navigation_data.stereo_bin[2] = avoid_navigation_data.stereo_bin[0] > 20;
+  avoid_navigation_data.stereo_bin[2] = avoid_navigation_data.stereo_bin[0] > 15;
   avoid_navigation_data.stereo_bin[3] = avoid_navigation_data.mode;
   avoid_navigation_data.stereo_bin[4] = counter;
 }

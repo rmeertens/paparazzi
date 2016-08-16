@@ -7,7 +7,7 @@
   <header>
     <file name="location_sender.h"/>
   </header>	
-  <periodic fun="send_current_location()" freq="1" autorun="TRUE"/>
+ <periodic fun="send_current_location()" freq="1" autorun="TRUE"/>
   <datalink message="MOVE_WP" fun="parse_this()"/>
    <makefile>
     <file name="location_sender.c"/>

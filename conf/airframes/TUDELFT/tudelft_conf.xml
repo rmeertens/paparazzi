@@ -335,10 +335,10 @@
    airframe="airframes/TUDELFT/abebop_avoid.xml"
    radio="radios/dummy.xml"
    telemetry="telemetry/default_rotorcraft.xml"
-   flight_plan="flight_plans/rotorcraft_basic.xml"
+   flight_plan="flight_plans/TUDELFT/tudelft_nus_demo_avoid.xml"
    settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int_quat.xml settings/control/rotorcraft_speed.xml"
    settings_modules="modules/gps.xml modules/geo_mag.xml modules/air_data.xml modules/video_rtp_stream.xml"
-   gui_color="#ffffbc3bce5b"
+   gui_color="#ffff00002cc3"
   />
   <aircraft
    name="abebop_detect"
@@ -346,10 +346,10 @@
    airframe="airframes/TUDELFT/abebop_detect.xml"
    radio="radios/dummy.xml"
    telemetry="telemetry/default_rotorcraft.xml"
-   flight_plan="flight_plans/rotorcraft_basic.xml"
+   flight_plan="flight_plans/rotorcraft_optitrack_stereoavoid.xml"
    settings="settings/rotorcraft_basic.xml settings/control/rotorcraft_guidance.xml settings/control/stabilization_att_int_quat.xml settings/control/rotorcraft_speed.xml"
    settings_modules="modules/gps.xml modules/geo_mag.xml modules/air_data.xml"
-   gui_color="#ffffbc3bce5b"
+   gui_color="#0ea8ffff0000"
   />
   <aircraft
    name="autonomous_race"
