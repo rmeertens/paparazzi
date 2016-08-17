@@ -79,10 +79,10 @@
    <define name="MODE_STARTUP" value="AP_MODE_NAV"/>
    <define name="MODE_MANUAL" value="AP_MODE_ATTITUDE_DIRECT"/>
    <define name="MODE_AUTO1" value="AP_MODE_ATTITUDE_DIRECT"/>
-   <define name="MODE_AUTO2" value="AP_MODE_ATTITUDE_DIRECT"/>
+   <define name="MODE_AUTO2" value="AP_MODE_NAV"/>
 
-    <define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="TRUE"/>
-    <define name="NO_RC_THRUST_LIMIT" value="TRUE"/>
+    <define name="USE_THROTTLE_FOR_MOTOR_ARMING" value="FALSE"/>
+    <define name="NO_RC_THRUST_LIMIT" value="FALSE"/>
  </section>
 
  <section name="BAT">
@@ -163,6 +163,9 @@
     <define name="H_Y" value="0.00278894"/>
     <define name="H_Z" value="0.92060036"/>
     <define name="USE_GPS_HEADING" value="1"/>
+
+    <define name="HEADING_UPDATE_GPS_MIN_SPEED" value="0"/>
+    <define name="GRAVITY_HEURISTIC_FACTOR" value="0"/>
   </section>
 
  <section name="GUIDANCE_H" prefix="GUIDANCE_H_">
@@ -183,6 +186,9 @@
 
  <modules main_freq="512">
    <module name="send_imu_mag_current"/>
+
+    <module name="location_sender">
+    </module>
 <!--
  <module name="stereocam">
 	<configure name="STEREO_UART" value="UART1"/>
@@ -222,7 +228,10 @@
 	
     <module name="gps" type="datalink"/>
     <module name="stabilization" type="int_quat"/>
-    <module name="ahrs" type="int_cmpl_quat"/>
+    <module name="ahrs" type="int_cmpl_quat">
+       <configure name="USE_MAGNETOMETER" value="FALSE"/>
+      <define name="AHRS_USE_GPS_HEADING" value="TRUE"/>
+    </module>
     <module name="ins"/>
   </firmware>
 </airframe>
