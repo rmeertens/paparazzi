@@ -40,18 +40,18 @@
 /* Camera structure */
 struct video_config_t bottom_camera = {
   .output_size = {
-    .w = 240,
-    .h = 240
+    .w = MT9V117_OUTPUT_WIDTH,
+    .h = MT9V117_OUTPUT_HEIGHT
   },
   .sensor_size = {
-    .w = 320,
-    .h = 240,
+    .w = MT9V117_SENSOR_WIDTH,
+    .h = MT9V117_SENSOR_HEIGHT
   },
   .crop = {
-    .x = 40,
-    .y = 0,
-    .w = 240,
-    .h = 240
+    .x = MT9V117_CROP_X,
+    .y = MT9V117_CROP_Y,
+    .w = MT9V117_CROP_WIDTH,
+    .h = MT9V117_CROP_HEIGHT
   },
   .dev_name = "/dev/video0",
   .subdev_name = "/dev/v4l-subdev0",
@@ -331,8 +331,8 @@ static inline void mt9v117_config(struct mt9v117_t *mt) {
   write_reg(mt, MT9V117_AE_TRACK_JUMP_DIVISOR, 0x03, 1);
   write_reg(mt, MT9V117_CAM_AET_SKIP_FRAMES, 0x02, 1);
 
-  write_var(mt, MT9V117_CAM_CTRL_VAR, MT9V117_CAM_OUTPUT_WIDTH_OFFSET, 320, 2);
-  write_var(mt, MT9V117_CAM_CTRL_VAR, MT9V117_CAM_OUTPUT_HEIGHT_OFFSET, 240, 2);
+  write_var(mt, MT9V117_CAM_CTRL_VAR, MT9V117_CAM_OUTPUT_WIDTH_OFFSET, MT9V117_SENSOR_WIDTH, 2);
+  write_var(mt, MT9V117_CAM_CTRL_VAR, MT9V117_CAM_OUTPUT_HEIGHT_OFFSET, MT9V117_SENSOR_HEIGHT, 2);
 
   /* Set gain metric for 111.2 fps
    * The final fps depends on the input clock
