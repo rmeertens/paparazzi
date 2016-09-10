@@ -1,0 +1,30 @@
+<!DOCTYPE module SYSTEM "module.dtd">
+
+<module name="replay_commands">
+  <doc>
+    <description>replays commands when switching from att to nav mode</description>
+  </doc>
+<settings>
+	<dl_settings NAME="Replay commands">
+
+      	<!-- Optical flow calculations parameters -->
+      <dl_settings name="state">
+      <dl_setting var="current_state" min="0" step="1" max="2" shortname="state" values="RECORDING|REPLAYING|NONE" param="STATE"/>
+      </dl_settings>
+    </dl_settings>
+  </settings>
+
+  <header>
+    <file name="replay_commands.h"/>
+  </header>
+  <init fun="replay_commands_init()"/>
+  <periodic fun="replay_commands_periodic()" freq="512" autorun="TRUE"/>
+  <makefile>
+    <file name="replay_commands.c"/>
+    <raw>
+        ap.CFLAGS += -DGUIDANCE_V_MODE_MODULE_SETTING=GUIDANCE_V_MODE_HOVER
+        ap.CFLAGS += -DGUIDANCE_H_MODE_MODULE_SETTING=GUIDANCE_H_MODE_MODULE
+    </raw>
+  </makefile>
+</module>
+
